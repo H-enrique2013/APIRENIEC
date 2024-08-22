@@ -1,11 +1,17 @@
 # Usa una imagen base oficial de Python
 FROM python:3.10.11
 
-# Instala Java (OpenJDK 19 en este caso)
-RUN apt-get update && apt-get install -y openjdk-19-jdk
+# Instala Java (OpenJDK 17 en este caso)
+RUN apt-get update && apt-get install -y openjdk-17-jdk
 
 # Establece la variable JAVA_HOME
-ENV JAVA_HOME /usr/lib/jvm/java-19-openjdk-amd64
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
+
+# Asegúrate de que java está en el PATH
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Verifica la instalación de Java
+RUN java -version
 
 # Copia el archivo requirements.txt y el código fuente
 COPY requirements.txt /app/
