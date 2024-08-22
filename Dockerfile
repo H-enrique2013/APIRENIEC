@@ -38,4 +38,5 @@ EXPOSE 8000
 
 # Comando por defecto para iniciar la aplicación
 CMD ["gunicorn", "-b", ":8000", "main:app"]
+RUN apt-get update && apt-get install -y ncurses-bin
 
