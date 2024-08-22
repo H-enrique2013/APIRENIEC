@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y curl && \
     mv spark-3.5.2-bin-hadoop3 /opt/spark && \
     rm spark-3.5.2-bin-hadoop3.tgz
 
+# Verificar la instalación de Spark
+RUN ls -l /opt/spark/bin && \
+    /opt/spark/bin/spark-submit --version
 # Configura SPARK_HOME y añade Spark al PATH
 ENV SPARK_HOME=/opt/spark
 ENV PATH="$SPARK_HOME/bin:$PATH"
