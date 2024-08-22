@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify,send_from_directory,render_template,re
 import os
 import threading
 import logging
+from werkzeug.utils import secure_filename
+import pandas as pd
 
 # Crear una instancia de ListBookWindow
 list_book_window = ListBookWindow()
@@ -18,58 +20,123 @@ def index():
 
 
 #Métodos POST
-#Método POST
+
 @app.route('/consultaDNI-Tipo1', methods=['POST'])
 def consultaDNI_Tipo1():
-    data = request.get_json()
-    n_dni = data.get('N_DNI')
-    if n_dni:
+    try:
+        data = request.get_json()
+        n_dni = data.get('N_DNI')
+        
+        # Validación del DNI
+        if not n_dni or len(n_dni) != 8 or not n_dni.isdigit():
+            return jsonify({"error": "DNI inválido. Debe ser un número de 8 dígitos"}), 400
+        
+        # Consultar el DNI en el método
         resultado = list_book_window.ConsultaDNI(n_dni)
-        return jsonify(resultado)
-    return jsonify({"error": "No se ha proporcionado DNI"}), 400
+        
+        # Verificar si el resultado es válido
+        if resultado:
+            return jsonify(resultado), 200
+        else:
+            return jsonify({"error": "No se encontró información para el DNI proporcionado"}), 404
+    except Exception as e:
+        return jsonify({"error": f"Ha ocurrido un error: {str(e)}"}), 500
 
 
-
-
-'''
 @app.route('/consultaDNI-Tipo2', methods=['POST'])
 def consultaDNI_Tipo2():
-    data = request.get_json()
-    dep = data.get('Departamento')
-    prov = data.get('Provincia')
-    distr = data.get('Distrito')
-    sect = data.get('Sector')
-    N_aleatorio = int(data.get('N_aleatorio'))
-    #Comprobando si el shape de Sector estadistico tiene geometry
-    file_shape=RutaShape(dep)
-    shape_sector=gpd.read_file(file_shape[0])
-    shape_sector=shape_sector[(shape_sector['NOMBDEP']==dep)&(shape_sector['NOMBPROV']==prov)&(shape_sector['NOMBDIST']==distr)]
-    lista_sector=shape_sector["NOM_SE"].to_numpy().tolist()
-
-    logging.info(f"Datos recibidos: dep={dep}, prov={prov}, distr={distr}, sect={sect}, N_aleatorio={N_aleatorio}")
-    
     try:
-        if str(lista_sector[-1]) == 'nan':
-            html_filepath = ViewModel.ProcesarModel(dep, prov, distr, sect, N_aleatorio,"NULL")
+        data = request.get_json()
+        Nom = data.get('Nombres', '').upper()  # Convertir a mayúsculas
+        Ap_Pat = data.get('Ap_Paterno', '').upper()  # Convertir a mayúsculas
+        Ap_Mat = data.get('Ap_Materno', '').upper()  # Convertir a mayúsculas
+        
+        # Validación de campos:
+        # Caso 1: Todos los campos deben ser diferentes de vacío
+        # Caso 2: Nom puede estar vacío, pero Ap_Pat y Ap_Mat deben ser diferentes de vacío
+        if (not Nom and (not Ap_Pat or not Ap_Mat)) or (not Ap_Pat or not Ap_Mat):
+            return jsonify({"error": "Debe ingresar Ap_Paterno y Ap_Materno, y opcionalmente Nombres"}), 400
+        
+        # Consultar nombres y apellidos
+        resultado = list_book_window.ConsultaNombresApellidos(Nom, Ap_Pat, Ap_Mat)
+        
+        # Verificar si el resultado es válido
+        if resultado:
+            return jsonify(resultado), 200
         else:
-            html_filepath = ViewModel.ProcesarModel(dep, prov, distr, sect, N_aleatorio,"NO NULL")
-
-        logging.info(f"html_filepath generado: {html_filepath}")
-
-        if html_filepath is None:
-            raise ValueError("El procesamiento del modelo devolvió None")
-
-        filename = os.path.basename(html_filepath)
-        directory = os.path.dirname(html_filepath)
-        response = send_from_directory(directory=directory, path=filename)
-        threading.Thread(target=delete_file, args=(html_filepath,)).start()
-        return response, 200
+            return jsonify({"error": "No se encontró información para los datos proporcionados"}), 404
     except Exception as e:
-        logging.error(f"Tipo de error: {type(e).__name__}")
-        logging.error(f"Mensaje de error: {str(e)}")
-        return jsonify({"error": f"Error al generar el mapa: {str(e)}"}), 500
+        return jsonify({"error": f"Ha ocurrido un error: {str(e)}"}), 500
+
+
+
+@app.route('/cargamasivaDNI-Tipo1', methods=['POST'])
+def cargamasivaDNI_Tipo1():
+    if 'archivo_excel' not in request.files:
+        return jsonify({"error": "No se ha subido ningún archivo"}), 400
+
+    archivo = request.files['archivo_excel']
+
+    if archivo.filename == '':
+        return jsonify({"error": "El archivo no tiene nombre"}), 400
+
+    # Verifica si es un archivo válido de Excel
+    if archivo and (archivo.filename.endswith('.xlsx') or archivo.filename.endswith('.xls')):
+        filename = secure_filename(archivo.filename)
+
+        try:
+            # Leer el archivo Excel directamente en un DataFrame
+            df = pd.read_excel(archivo,dtype={'DNI': str})
+
+            # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
+            resultado = list_book_window.seleccionar_archivo_xlsx(df)
+            
+            # Verificar si el resultado es válido
+            if resultado:
+                return jsonify(resultado), 200
+            else:
+                return jsonify({"error": "No se encontró información para los datos proporcionados"}), 404
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    else:
+        return jsonify({"error": "Formato de archivo no soportado"}), 400
+
+
+@app.route('/cargamasivaplatillaDNI-Tipo1', methods=['POST'])
+def cargamasivaplantillaDNI_Tipo1():
+    if 'archivoplantilla_excel' not in request.files:
+        return jsonify({"error": "No se ha subido ningún archivo"}), 400
+
+    archivo = request.files['archivoplantilla_excel']
+
+    if archivo.filename == '':
+        return jsonify({"error": "El archivo no tiene nombre"}), 400
+
+    # Verifica si es un archivo válido de Excel
+    if archivo and (archivo.filename.endswith('.xlsx') or archivo.filename.endswith('.xls')):
+        filename = secure_filename(archivo.filename)
+
+        try:
+            # Leer el archivo Excel directamente en un DataFrame
+            df = pd.read_excel(archivo,dtype={'DNI': str})
+
+            # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
+            plantilla= list_book_window.seleccionar_archivo_Plantilla_xlsx(df)
+            
+            # Verificar si el resultado es válido
+            if plantilla:
+                return jsonify(plantilla), 200
+            else:
+                return jsonify({"error": "No se encontró información para los datos proporcionados"}), 404
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    else:
+        return jsonify({"error": "Formato de archivo no soportado"}), 400
     
-'''
 
 @app.route('/geopandasIcon.ico')
 def favicon():

@@ -14,7 +14,6 @@ class ListBookWindow():
         
         # Convierte el DataFrame a una lista de tuplas
         resultado_tuplas = [tuple(row) for row in resultado_seleccionado.collect()]
-        
         return resultado_tuplas
 
     def ConsultaNombresApellidos(self, Nom, Ap_pat, Ap_mat):
@@ -26,7 +25,7 @@ class ListBookWindow():
             
         elif Nom == "" and Ap_pat != "" and Ap_mat != "":
             resultado = self.df.filter((self.df["AP_PAT"] == Ap_pat) & (self.df["AP_MAT"] == Ap_mat))
-            resultado.show()
+            
         # Selecciona solo las columnas requeridas
         resultado_seleccionado = resultado.select("DNI", "NOMBRES", "AP_PAT", "AP_MAT", "FECHA_NAC", "DIRECCION", "EST_CIVIL", "MADRE", "PADRE","SEXO")
         
@@ -55,27 +54,22 @@ class ListBookWindow():
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas
         resultado_seleccionado = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
-        # Convierte a tupla usando collect()
-        tuplas_resultado = [tuple(row) for row in resultado_seleccionado.collect()]
-        return tuplas_resultado
-    
-    
-    def seleccionar_archivo_xlsx(self,archivo):
         
-        dfDNI = pd.read_excel(archivo, dtype={'DNI': str})
+        return resultado_seleccionado
+    
+    
+    def seleccionar_archivo_xlsx(self,df):
+        dfDNI = df
         lista_DNI = dfDNI['DNI'].tolist()
-        DfRegistro_DNI = self.CargaMasivaDNI(lista_DNI)
-        
-        return DfRegistro_DNI
+        resultado_tuplas = self.CargaMasivaDNI(lista_DNI)
+        return resultado_tuplas
         
         
 
 
-    def seleccionar_archivo_Plantilla_xlsx(self,archivo1):
+    def seleccionar_archivo_Plantilla_xlsx(self,df):
         
-        
-        dfDNI = pd.read_excel(archivo1, dtype={'DNI': str})
-        print(dfDNI)
+        dfDNI = df
         lista_DNI = dfDNI['DNI'].tolist()
         
         DataFrameSpark = self.CargaMasivaPlantillaDNI(lista_DNI)
@@ -161,15 +155,17 @@ class ListBookWindow():
             merged_df2=pd.concat([merged_df2, Nuevo_dfDNI_NoEncontrados], ignore_index=True)
 
         #Creando los dataframe para las plantillas
-        self.dataframePadron= merged_df2[["DNI","AP_PAT","AP_MAT","NOMBRES","SEXO","FECHA_NAC","UBIGEO_DIR",
-                                          "DIRECCION","DISTRITO_D","PROVINCIA_D","Superficie","Monto_Indemnizable"]]
+        #dataframePadron= merged_df2[["DNI","AP_PAT","AP_MAT","NOMBRES","SEXO","FECHA_NAC","UBIGEO_DIR",
+        #                                  "DIRECCION","DISTRITO_D","PROVINCIA_D","Superficie","Monto_Indemnizable"]]
 
-        self.dataframeBanco= merged_df2[["DNI","NOMBRES","AP_PAT","AP_MAT","FECHA_NAC",
-                                          "EST_CIVIL","SEXO"]]
+        #dataframeBanco= merged_df2[["DNI","NOMBRES","AP_PAT","AP_MAT","FECHA_NAC",
+        #                                  "EST_CIVIL","SEXO"]]
 
-        merged_df2.drop(columns=['EST_CIVIL'], inplace=True)
+        #merged_df2.drop(columns=['EST_CIVIL'], inplace=True)
 
         DtaTuplas_Plantilla = merged_df2.values.tolist()
+        
+        
         return DtaTuplas_Plantilla
        
         
