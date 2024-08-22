@@ -11,16 +11,21 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 # Verifica la instalación de Java
 RUN java -version
 
-# Instala Spark
-RUN apt-get update && apt-get install -y curl && \
-    curl -O https://dlcdn.apache.org/spark/spark-3.5.2/spark-3.5.2-bin-hadoop3.tgz && \
-    tar -xvf spark-3.5.2-bin-hadoop3.tgz && \
-    mv spark-3.5.2-bin-hadoop3 /opt/spark && \
-    rm spark-3.5.2-bin-hadoop3.tgz
+
+# Descargar e instalar Spark
+RUN wget https://archive.apache.org/dist/spark/spark-3.5.2/spark-3.5.2-bin-hadoop3.tgz -O spark.tgz \
+    && tar -xzf spark.tgz -C /opt \
+    && rm spark.tgz \
+    && mv /opt/spark-3.5.2-bin-hadoop3 /opt/spark \
+    && ln -s /opt/spark/bin/spark-submit /usr/local/bin/spark-submit
+
+
+
 
 # Verificar la instalación de Spark
 RUN ls -l /opt/spark/bin && \
     /opt/spark/bin/spark-submit --version
+
 # Configura SPARK_HOME y añade Spark al PATH
 ENV SPARK_HOME=/opt/spark
 ENV PATH="$SPARK_HOME/bin:$PATH"
