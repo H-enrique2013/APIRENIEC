@@ -1,10 +1,11 @@
 # Usa una imagen base oficial de Python
 FROM python:3.10.11-slim
 
-# Instala Java (OpenJDK 17 en este caso)
+# Instala Java (OpenJDK 17 en este caso) y ncurses-base para tput
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openjdk-17-jdk \
     wget \
+    ncurses-base \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Establece la variable JAVA_HOME y añade Java al PATH
