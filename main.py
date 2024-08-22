@@ -1,8 +1,5 @@
 from controllers.main_window import ListBookWindow
 from flask import Flask, request, jsonify,send_from_directory,render_template,redirect
-import os
-import threading
-import logging
 from werkzeug.utils import secure_filename
 import pandas as pd
 
