@@ -1,5 +1,5 @@
 # Usa una imagen base oficial de Python
-FROM python:3.10.11-slim
+FROM python:3.11-slim
 
 # Instala Java (OpenJDK 17 en este caso) y ncurses-base para tput
 RUN apt-get update && apt-get install -y --no-install-recommends \
