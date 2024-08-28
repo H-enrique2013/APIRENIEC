@@ -1,49 +1,26 @@
-# Usa una imagen base oficial de Python
-FROM python:3.11-slim as base
+FROM python:3.10.11
 
-# Establece variables de entorno para no tener que interactuar
-ENV DEBIAN_FRONTEND=noninteractive
+# Instalar OpenJDK
+RUN apt-get update && apt-get install -y openjdk-17-jdk
 
-# Instala Java (OpenJDK 17 en este caso), ncurses-base para tput, y utilidades esenciales
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-17-jdk \
-    wget \
-    ncurses-base \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Establece la variable JAVA_HOME y añade Java al PATH
+# Configurar JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PATH="$JAVA_HOME/bin:$PATH"
-
-# Verifica la instalación de Java
-RUN java -version
 
 # Descargar e instalar Spark
-RUN wget https://archive.apache.org/dist/spark/spark-3.5.2/spark-3.5.2-bin-hadoop3.tgz -O spark.tgz \
-    && tar -xzf spark.tgz -C /opt \
-    && rm spark.tgz \
-    && mv /opt/spark-3.5.2-bin-hadoop3 /opt/spark \
-    && ln -s /opt/spark/bin/spark-submit /usr/local/bin/spark-submit
+RUN curl -sL https://archive.apache.org/dist/spark/spark-3.5.2/spark-3.5.2-bin-hadoop3.tgz | tar xz -C /opt
+ENV SPARK_HOME=/opt/spark-3.5.2-bin-hadoop3
+ENV PATH=$SPARK_HOME/bin:$PATH
 
-# Verifica la instalación de Spark
-RUN ls -l /opt/spark/bin && \
-    /opt/spark/bin/spark-submit --version
+# Copiar archivos de la aplicación
+COPY . /app
 
-# Configura SPARK_HOME y añade Spark al PATH
-ENV SPARK_HOME=/opt/spark
-ENV PATH="$SPARK_HOME/bin:$PATH"
-
-# Copia el archivo requirements.txt e instala las dependencias de Python
-COPY requirements.txt /app/
+# Instalar dependencias
 WORKDIR /app
-RUN pip install --no-cache-dir -r requirements.txt && \
-    rm -rf ~/.cache/pip
+RUN pip install -r requirements.txt
 
-# Copia el código fuente
-COPY . /app/
-
-# Expone el puerto 8000
+# Exponer el puerto
 EXPOSE 8000
 
-# Comando por defecto para iniciar la aplicación
-CMD ["gunicorn", "-b", ":8000", "main:app"]
+# Comando para iniciar la aplicación
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "main:app"]
+
