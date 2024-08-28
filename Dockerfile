@@ -1,26 +1,37 @@
-FROM python:3.10.11
+# Usar una imagen base de Python
+FROM python:3.10.11-slim
 
-# Instalar OpenJDK
-RUN apt-get update && apt-get install -y openjdk-17-jdk
+# Instalar dependencias necesarias para Java y Spark
+RUN apt-get update && apt-get install -y \
+    curl \
+    openjdk-17-jdk \
+    && apt-get clean
 
-# Configurar JAVA_HOME
+# Establecer las variables de entorno de Java y Spark
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV SPARK_VERSION=3.5.2
+ENV SPARK_HOME=/opt/spark
+ENV PATH="$SPARK_HOME/bin:$PATH"
 
-# Descargar e instalar Spark
-RUN curl -sL https://archive.apache.org/dist/spark/spark-3.5.2/spark-3.5.2-bin-hadoop3.tgz | tar xz -C /opt
-ENV SPARK_HOME=/opt/spark-3.5.2-bin-hadoop3
-ENV PATH=$SPARK_HOME/bin:$PATH
+# Descargar y descomprimir Apache Spark
+RUN curl -O https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz && \
+    tar -xzf spark-$SPARK_VERSION-bin-hadoop3.tgz -C /opt/ && \
+    mv /opt/spark-$SPARK_VERSION-bin-hadoop3 $SPARK_HOME && \
+    rm spark-$SPARK_VERSION-bin-hadoop3.tgz
 
-# Copiar archivos de la aplicación
+
+
+# Configura el directorio de trabajo
+WORKDIR /app
+
+# Copia los archivos de la aplicación al contenedor
 COPY . /app
 
-# Instalar dependencias
-WORKDIR /app
-RUN pip install -r requirements.txt
+# Instala las dependencias
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Exponer el puerto
+# Exponer el puerto donde correrá tu aplicación
 EXPOSE 8000
 
-# Comando para iniciar la aplicación
+# Iniciar la aplicación con Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "main:app"]
-
