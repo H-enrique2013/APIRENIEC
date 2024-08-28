@@ -1,7 +1,10 @@
 # Usa una imagen base oficial de Python
-FROM python:3.11-slim
+FROM python:3.11-slim as base
 
-# Instala Java (OpenJDK 17 en este caso) y ncurses-base para tput
+# Establece variables de entorno para no tener que interactuar
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instala Java (OpenJDK 17 en este caso), ncurses-base para tput, y utilidades esenciales
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openjdk-17-jdk \
     wget \
@@ -22,7 +25,7 @@ RUN wget https://archive.apache.org/dist/spark/spark-3.5.2/spark-3.5.2-bin-hadoo
     && mv /opt/spark-3.5.2-bin-hadoop3 /opt/spark \
     && ln -s /opt/spark/bin/spark-submit /usr/local/bin/spark-submit
 
-# Verificar la instalación de Spark
+# Verifica la instalación de Spark
 RUN ls -l /opt/spark/bin && \
     /opt/spark/bin/spark-submit --version
 
@@ -33,7 +36,8 @@ ENV PATH="$SPARK_HOME/bin:$PATH"
 # Copia el archivo requirements.txt e instala las dependencias de Python
 COPY requirements.txt /app/
 WORKDIR /app
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    rm -rf ~/.cache/pip
 
 # Copia el código fuente
 COPY . /app/
