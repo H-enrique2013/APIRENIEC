@@ -20,6 +20,9 @@ RUN curl -O https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VER
     rm spark-$SPARK_VERSION-bin-hadoop3.tgz
 
 
+RUN ls -l $SPARK_HOME/bin/
+RUN chmod +x $SPARK_HOME/bin/spark-submit
+RUN echo $JAVA_HOME && echo $SPARK_HOME && echo $PATH
 
 # Configura el directorio de trabajo
 WORKDIR /app
