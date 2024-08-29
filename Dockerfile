@@ -9,17 +9,17 @@ RUN apt-get update && apt-get install -y \
 
 # Establecer las variables de entorno de Java y Spark
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV SPARK_VERSION=3.5.2
+ENV SPARK_VERSION=3.5.1
 ENV SPARK_HOME=/opt/spark
 ENV PATH="$SPARK_HOME/bin:$PATH"
 
-# Descargar y descomprimir Apache Spark
-RUN curl -O https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz && \
-    tar -xzf spark-$SPARK_VERSION-bin-hadoop3.tgz -C /opt/ && \
+# Descargar y descomprimir Apache Spark con la URL corregida
+RUN curl -fSL https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz -o spark.tgz && \
+    tar -xzf spark.tgz -C /opt/ && \
     mv /opt/spark-$SPARK_VERSION-bin-hadoop3 $SPARK_HOME && \
-    rm spark-$SPARK_VERSION-bin-hadoop3.tgz
+    rm spark.tgz
 
-
+# Verificar contenido de $SPARK_HOME/bin/ para asegurarnos de que spark-submit existe
 RUN ls -l $SPARK_HOME/bin/
 RUN chmod +x $SPARK_HOME/bin/spark-submit
 RUN echo $JAVA_HOME && echo $SPARK_HOME && echo $PATH
