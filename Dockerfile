@@ -29,6 +29,7 @@ WORKDIR /app
 
 # Copia los archivos de la aplicación al contenedor
 COPY . /app
+COPY script.py /app/
 
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
