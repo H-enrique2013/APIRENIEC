@@ -34,14 +34,20 @@ RUN chmod +x $SPARK_HOME/bin/* && chmod +x $HADOOP_HOME/bin/*
 RUN ls -l $SPARK_HOME/bin/ && ls -l $HADOOP_HOME/bin/
 RUN echo $JAVA_HOME && echo $SPARK_HOME && echo $HADOOP_HOME && echo $PATH
 
+# Establecer el PATH para incluir el directorio de instalación de gunicorn
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
 RUN pip install --upgrade pip
+RUN useradd -ms /bin/sh appuser
+USER appuser
 
 # Configurar el directorio de trabajo
 WORKDIR /app
 
 # Copiar los archivos de la aplicación al contenedor
 COPY . .
-
+# Copia el archivo de requisitos y lo instala
+COPY requirements.txt .
 # Instalar las dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
