@@ -34,6 +34,8 @@ RUN chmod +x $SPARK_HOME/bin/* && chmod +x $HADOOP_HOME/bin/*
 RUN ls -l $SPARK_HOME/bin/ && ls -l $HADOOP_HOME/bin/
 RUN echo $JAVA_HOME && echo $SPARK_HOME && echo $HADOOP_HOME && echo $PATH
 
+RUN pip install --upgrade pip
+
 # Configurar el directorio de trabajo
 WORKDIR /app
 
