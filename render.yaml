@@ -3,3 +3,5 @@ envVars:
     value: /usr/lib/jvm/java-17-openjdk-amd64
   - key: SPARK_HOME
     value: /opt/spark
+  - key: HADOOP_HOME
+    value: /opt/hadoop
