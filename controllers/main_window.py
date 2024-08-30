@@ -170,9 +170,17 @@ class ListBookWindow():
        
         
     # Inicializa una sesión de Spark
+    #spark = SparkSession.builder \
+    #    .appName("Lectura de archivo") \
+    #    .getOrCreate()
+    
     spark = SparkSession.builder \
-        .appName("Lectura de archivo") \
-        .getOrCreate()
+     .appName("Lectura de archivo") \
+     .config("spark.executor.memory", "4g") \
+     .config("spark.driver.memory", "2g") \
+     .config("spark.executor.cores", "2") \
+     .config("spark.sql.shuffle.partitions", "10") \
+     .getOrCreate()
 
     # Define el esquema de tu DataFrame
     schema = StructType() \
@@ -200,8 +208,4 @@ class ListBookWindow():
         .csv("./reniec.txt")\
         .repartition("DNI")
     
-
-    
-#Nuevos cambios
-#HECHOS!
             
