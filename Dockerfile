@@ -61,6 +61,8 @@ RUN chown -R appuser:appuser /app
 # Cambiar al usuario no root
 USER appuser
 
+RUN chmod -R 755 /app
+
 # Exponer el puerto para la aplicación Flask
 EXPOSE 8000
 
