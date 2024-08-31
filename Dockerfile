@@ -37,22 +37,32 @@ RUN echo $JAVA_HOME && echo $SPARK_HOME && echo $HADOOP_HOME && echo $PATH
 # Establecer el PATH para incluir el directorio de instalación de gunicorn
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
+# Ejecutar como root hasta que todas las instalaciones estén completas
 RUN pip install --upgrade pip
-RUN useradd -ms /bin/sh appuser
-USER appuser
 
-# Configurar el directorio de trabajo
+# Crear el usuario y cambiar permisos en el directorio de trabajo
+RUN useradd -ms /bin/sh appuser
+
+# Cambiar al directorio de trabajo antes de copiar los archivos
 WORKDIR /app
 
-# Copiar los archivos de la aplicación al contenedor
+# Copiar los archivos de la aplicación
 COPY . .
-# Copia el archivo de requisitos y lo instala
+
+# Copiar el archivo de requisitos
 COPY requirements.txt .
-# Instalar las dependencias de Python
+
+# Instalar dependencias usando pip como root
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Exponer el puerto donde correrá tu aplicación
+# Cambiar los permisos de la carpeta de trabajo a appuser
+RUN chown -R appuser:appuser /app
+
+# Cambiar al usuario no root
+USER appuser
+
+# Exponer el puerto para la aplicación Flask
 EXPOSE 8000
 
-# Iniciar la aplicación con Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "main:app"]
+# Comando para ejecutar gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app"]
