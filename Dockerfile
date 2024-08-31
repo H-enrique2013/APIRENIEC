@@ -65,4 +65,5 @@ USER appuser
 EXPOSE 8000
 
 # Comando para ejecutar gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app"]
+#CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "--log-level", "debug", "main:app"]
