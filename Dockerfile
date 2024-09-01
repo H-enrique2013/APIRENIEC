@@ -67,4 +67,5 @@ EXPOSE 8000
 
 # Comando para ejecutar gunicorn
 #CMD ["gunicorn", "--timeout", "120", "-b", "0.0.0.0:8000", "main:app"]
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app", "--timeout", "120", "--access-logfile", "/var/log/gunicorn_access.log", "--error-logfile", "/var/log/gunicorn_error.log"]
+#CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app", "--timeout", "120", "--access-logfile", "/var/log/gunicorn_access.log", "--error-logfile", "/var/log/gunicorn_error.log"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app", "--timeout", "120", "--access-logfile", "/tmp/gunicorn_access.log", "--error-logfile", "/tmp/gunicorn_error.log"]
