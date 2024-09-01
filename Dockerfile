@@ -35,11 +35,9 @@ RUN chmod +x $SPARK_HOME/bin/* && chmod +x $HADOOP_HOME/bin/*
 RUN ls -l $SPARK_HOME/bin/ && ls -l $HADOOP_HOME/bin/
 RUN echo $JAVA_HOME && echo $SPARK_HOME && echo $HADOOP_HOME && echo $PATH
 
-# Establecer el PATH para incluir el directorio de instalación de gunicorn
-ENV PATH="/home/appuser/.local/bin:${PATH}"
-
-# Ejecutar como root hasta que todas las instalaciones estén completas
+# Instalar gunicorn y otros paquetes necesarios
 RUN pip install --upgrade pip
+RUN pip install --no-cache-dir gunicorn
 
 # Crear el usuario y cambiar permisos en el directorio de trabajo
 RUN useradd -ms /bin/sh appuser
@@ -66,6 +64,4 @@ USER appuser
 EXPOSE 8000
 
 # Comando para ejecutar gunicorn
-#CMD ["gunicorn", "--timeout", "120", "-b", "0.0.0.0:8000", "main:app"]
-#CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app", "--timeout", "120", "--access-logfile", "/var/log/gunicorn_access.log", "--error-logfile", "/var/log/gunicorn_error.log"]
 CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app", "--timeout", "120", "--access-logfile", "/tmp/gunicorn_access.log", "--error-logfile", "/tmp/gunicorn_error.log"]
