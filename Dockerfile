@@ -5,7 +5,8 @@ FROM python:3.10.11-slim
 RUN apt-get update && apt-get install -y \
     curl \
     openjdk-17-jdk \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    procps && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Establecer las variables de entorno de Java, Spark y Hadoop
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
@@ -53,7 +54,7 @@ COPY . .
 COPY requirements.txt .
 
 # Instalar dependencias usando pip como root
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout=120 -r requirements.txt
 
 # Cambiar los permisos de la carpeta de trabajo a appuser
 RUN chown -R appuser:appuser /app
@@ -61,11 +62,8 @@ RUN chown -R appuser:appuser /app
 # Cambiar al usuario no root
 USER appuser
 
-RUN chmod -R 755 /app
-
 # Exponer el puerto para la aplicación Flask
 EXPOSE 8000
 
 # Comando para ejecutar gunicorn
-#CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app"]
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "--log-level", "debug", "main:app"]
+CMD ["gunicorn", "--timeout", "120", "-b", "0.0.0.0:8000", "main:app"]
