@@ -60,8 +60,8 @@ RUN chown -R appuser:appuser /app
 # Cambiar al usuario no root
 USER appuser
 
-# Exponer el puerto para la aplicación Flask
-EXPOSE 8000
+# Exponer los puertos para la aplicación Flask y Spark
+EXPOSE 8000 4040
 
-# Comando para ejecutar gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "main:app", "--timeout", "120", "--access-logfile", "/tmp/gunicorn_access.log", "--error-logfile", "/tmp/gunicorn_error.log"]
+# Comando para ejecutar el script de arranque
+CMD ["bash", "/app/start.sh"]
