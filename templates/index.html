@@ -1,13 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Subir archivo Excel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Render Coordinates</title>
+    <style>
+        body {
+            background-color: #f5eeee; /* Color de fondo claro */
+            color: white; /* Color de texto */
+            font-family: Arial, sans-serif; /* Fuente del texto */
+            padding: 20px; /* Espaciado interior */
+        }
+        
+        .Titulo {
+            background-color: #fc0808;
+            color: #f5eeee;
+            text-align: center; /* Para centrar el contenido */
+            padding: 10px; /* Espaciado interior */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+        
+        .Contenido {
+            background-color: #827f7f; /* Color de fondo oscuro para el div */
+            padding: 15px; /* Espaciado interior del div */
+            margin-top: 20px; /* Margen superior */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+        
+        pre {
+            white-space: pre-wrap; /* Envolver el contenido del pre */
+            color: #f5eeee; /* Color del texto dentro del pre */
+        }
+        
+        h2 {
+            color: red;
+        }
+        
+        p span {
+            font-weight: bold;
+        }
+        
+        p span.url {
+            color: red;
+        }
+        
+        p span.json-label {
+            color: green;
+        }
+    </style>
 </head>
 <body>
-    <h1>Sube tu archivo Excel</h1>
-    <form action="/subir" method="POST" enctype="multipart/form-data">
-        <input type="file" name="archivo_excel" accept=".xlsx, .xls">
-        <input type="submit" value="Subir">
-    </form>
+    <div class="Titulo">
+        <h1>API CONSULTA RENIEC</h1>
+    </div>
+    <br>
+    <h2>Url de los Endpoint 1</h2>
+    <div class="contenido">
+        <p>
+            <span class="json-label">File HTML:</span>
+            <span class="url">https://apireniec-590e.onrender.com/consultaDNI-Tipo1</span>
+        </p>
+       
+    </div>
+    <br>
+    <h2>Parámetros para el método POST</h2>
+    <div class="Contenido">
+        <p>
+            <span class="json-label">JSON de ejemplo:</span>
+        </p>
+        <pre>
+            {
+                "N_DNI": "04437283"
+            
+            }
+        </pre>
+    </div>
+    <br>
+    <h2>Url de los Endpoint 2</h2>
+    <div class="contenido">
+        <p>
+            <span class="json-label">File HTML:</span>
+            <span class="url">https://apireniec-590e.onrender.com/consultaDNI-Tipo2</span>
+        </p>
+       
+    </div>
+    <br>
+    <h2>Parámetros para el método POST</h2>
+    <div class="Contenido">
+        <p>
+            <span class="json-label">JSON de ejemplo:</span>
+        </p>
+        <pre>
+            {
+                "Nombres": "CARLOS",
+                "Ap_Paterno": "ABAD",
+                "Ap_Materno": "WON"
+            
+            }
+        </pre>
+    </div>
+    <br>
+    <h2>Url de los Endpoint 3</h2>
+    <div class="contenido">
+        <p>
+            <span class="json-label">File HTML:</span>
+            <span class="url">https://apireniec-590e.onrender.com/cargamasivaDNI-Tipo1</span>
+        </p>
+       
+    </div>
+    <br>
+    <h2>Parámetros para el método POST</h2>
+    <div class="Contenido">
+        <p>
+            <span class="json-label">JSON de ejemplo:</span>
+        </p>
+        <pre>
+            {
+                "archivo_excel": ejemploarchivo.xlsx
+            }
+        </pre>
+    </div>
+    <br>
+    <h2>Url de los Endpoint 4</h2>
+    <div class="contenido">
+        <p>
+            <span class="json-label">File HTML:</span>
+            <span class="url">https://apireniec-590e.onrender.com/cargamasivaplatillaDNI-Tipo1</span>
+        </p>
+       
+    </div>
+    <br>
+    <h2>Parámetros para el método POST</h2>
+    <div class="Contenido">
+        <p>
+            <span class="json-label">JSON de ejemplo:</span>
+        </p>
+        <pre>
+            {
+                "archivoplantilla_excel": ejemploarchivo.xlsx
+            }
+        </pre>
+    </div>
 </body>
 </html>
