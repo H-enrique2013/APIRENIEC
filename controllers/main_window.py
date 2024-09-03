@@ -200,12 +200,11 @@ class ListBookWindow():
         .add("DIG_RUC", StringType(), True) \
         .add("MADRE", StringType(), True) \
         .add("PADRE", StringType(), True)
-
+    
+    
     # Lee el archivo con separador '|'
     df = spark.read \
         .option("delimiter", "|") \
         .schema(schema) \
         .csv("./reniec.txt")\
         .repartition("DNI")
-    
-            
