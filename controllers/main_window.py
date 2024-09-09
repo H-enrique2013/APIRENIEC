@@ -164,7 +164,7 @@ class ListBookWindow():
 
         DtaTuplas_Plantilla = merged_df2.values.tolist()
         
-        
+        print(merged_df2.columns)
         return DtaTuplas_Plantilla
        
         
