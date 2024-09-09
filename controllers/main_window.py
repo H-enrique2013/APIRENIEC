@@ -67,9 +67,9 @@ class ListBookWindow():
         
 
 
-    def seleccionar_archivo_Plantilla_xlsx(self,df):
+    def seleccionar_archivo_Plantilla_xlsx(self,dfPlantilla):
         
-        dfDNI = df
+        dfDNI = dfPlantilla
         lista_DNI = dfDNI['DNI'].tolist()
         
         DataFrameSpark = self.CargaMasivaPlantillaDNI(lista_DNI)
@@ -107,10 +107,9 @@ class ListBookWindow():
 
         
         merged_df1 = pd.merge(merged_df,dfUbigeos_nac, on='UBIGEO_NAC', how='left')
-        merged_df2 = merged_df1[["Secuencia","Usuario","Sector","Fecha_Registro","Departamento",
-                          "Anverso_DNI","Reverso_DNI","DNI","Superficie","Monto_Indemnizable","AP_PAT", "AP_MAT","NOMBRES",
-                          "SEXO","FECHA_NAC","EST_CIVIL","DIRECCION","UBIGEO_DIR","DEPARTAMENTO_D","PROVINCIA_D","DISTRITO_D",
-                          "PADRE","MADRE","UBIGEO_NAC","DEPARTAMENTO_N","PROVINCIA_N","DISTRITO_N"]]
+        merged_df2 = merged_df1[["DNI","Superficie","Monto_Indemnizable","AP_PAT_ENTRADA","AP_MAT_ENTRADA","NOMBRES_ENTRADA",
+                                 "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC","EST_CIVIL","DIRECCION","UBIGEO_DIR","DEPARTAMENTO_D","PROVINCIA_D","DISTRITO_D",
+                                 "PADRE","MADRE","UBIGEO_NAC","DEPARTAMENTO_N","PROVINCIA_N","DISTRITO_N"]]
 
         #Realizar el codigo para completar la columna "UBIGEO_DIR" que está vacia
         #Renombrar las columnas de dfUbigeos_nac
