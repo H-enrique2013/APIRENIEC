@@ -203,5 +203,5 @@ class ListBookWindow():
     df = spark.read \
         .option("delimiter", "|") \
         .schema(schema) \
-        .csv("./reniec.txt")\
+        .csv("/data/reniec.txt")\
         .repartition("DNI")
