@@ -171,13 +171,14 @@ class ListBookWindow():
     #    .appName("Lectura de archivo") \
     #    .getOrCreate()
     
+    # Inicializa Spark
     spark = SparkSession.builder \
-     .appName("Lectura de archivo") \
-     .config("spark.executor.memory", "4g") \
-     .config("spark.driver.memory", "2g") \
-     .config("spark.executor.cores", "2") \
-     .config("spark.sql.shuffle.partitions", "10") \
-     .getOrCreate()
+        .appName("Lectura de archivo") \
+        .config("spark.executor.memory", "4g") \
+        .config("spark.driver.memory", "2g") \
+        .config("spark.executor.cores", "2") \
+        .config("spark.sql.shuffle.partitions", "10") \
+        .getOrCreate()
 
     # Define el esquema de tu DataFrame
     schema = StructType() \
@@ -197,11 +198,25 @@ class ListBookWindow():
         .add("DIG_RUC", StringType(), True) \
         .add("MADRE", StringType(), True) \
         .add("PADRE", StringType(), True)
-    
-    
-    # Lee el archivo con separador '|'
-    df = spark.read \
-        .option("delimiter", "|") \
-        .schema(schema) \
-        .csv("/data/reniec.txt")\
-        .repartition("DNI")
+
+    # Verifica el contenido del directorio /data
+    try:
+        print("Contenido de /data:")
+        print(spark.sparkContext.wholeTextFiles("/data/*").keys().collect())
+    except Exception as e:
+        print(f"Error al acceder a /data: {e}")
+
+    # Lee el archivo
+    try:
+        df = spark.read \
+            .option("delimiter", "|") \
+            .schema(schema) \
+            .csv("/data/reniec.txt") \
+            .repartition("DNI")
+
+        # Muestra el esquema y una muestra de los datos
+        #df.printSchema()
+        #df.show(10)
+
+    except Exception as e:
+        print(f"Error al leer el archivo: {e}")
