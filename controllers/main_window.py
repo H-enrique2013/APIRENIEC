@@ -225,6 +225,7 @@ class ListBookWindow():
     
     # Detener el contexto de Spark si ya está en ejecución
     try:
+        df=df
         spark.stop()
     except Exception as e:
         print(f"Error al detener el contexto de Spark: {e}")
@@ -234,4 +235,3 @@ class ListBookWindow():
 
     # Después de esto, puedes continuar con el resto de tu lógica
 
-    
