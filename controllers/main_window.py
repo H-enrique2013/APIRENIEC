@@ -221,17 +221,3 @@ class ListBookWindow():
 
     except Exception as e:
         print(f"Error al leer el archivo: {e}")
-
-    
-    # Detener el contexto de Spark si ya está en ejecución
-    try:
-        df=df
-        spark.stop()
-    except Exception as e:
-        print(f"Error al detener el contexto de Spark: {e}")
-
-    # Si usas acumuladores, inicialízalos aquí (ejemplo):
-    # my_accumulator = spark.sparkContext.accumulator(0)
-
-    # Después de esto, puedes continuar con el resto de tu lógica
-
