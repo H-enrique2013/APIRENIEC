@@ -31,6 +31,10 @@ def consultaDNI_Tipo1():
         # Consultar el DNI en el método
         resultado = list_book_window.ConsultaDNI(n_dni)
         
+        # Realiza operaciones con list_book_window...
+        list_book_window.stop_spark()
+
+        
         # Verificar si el resultado es válido
         if resultado:
             return jsonify(resultado), 200
@@ -56,6 +60,8 @@ def consultaDNI_Tipo2():
         
         # Consultar nombres y apellidos
         resultado = list_book_window.ConsultaNombresApellidos(Nom, Ap_Pat, Ap_Mat)
+        # Realiza operaciones con list_book_window...
+        list_book_window.stop_spark()
         
         # Verificar si el resultado es válido
         if resultado:
@@ -87,6 +93,8 @@ def cargamasivaDNI_Tipo1():
 
             # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
             resultado = list_book_window.seleccionar_archivo_xlsx(df)
+            # Realiza operaciones con list_book_window...
+            list_book_window.stop_spark()
             
             # Verificar si el resultado es válido
             if resultado:
@@ -121,6 +129,8 @@ def cargamasivaplantillaDNI_Tipo1():
 
             # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
             plantilla= list_book_window.seleccionar_archivo_Plantilla_xlsx(df)
+            # Realiza operaciones con list_book_window...
+            list_book_window.stop_spark()
             
             # Verificar si el resultado es válido
             if plantilla:

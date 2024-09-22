@@ -4,6 +4,47 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
 
 class ListBookWindow():
+
+    def __init__(self):
+        self.df = None  # Inicializa el atributo df
+        self.spark = SparkSession.builder \
+            .appName("Lectura de archivo") \
+            .config("spark.executor.memory", "4g") \
+            .config("spark.driver.memory", "2g") \
+            .config("spark.executor.cores", "2") \
+            .config("spark.sql.shuffle.partitions", "10") \
+            .getOrCreate()
+        
+        self.load_data()  # Cargar datos al inicializar la clase
+
+    def load_data(self):
+        schema = StructType() \
+            .add("DNI", StringType(), True) \
+            .add("AP_PAT", StringType(), True) \
+            .add("AP_MAT", StringType(), True) \
+            .add("NOMBRES", StringType(), True) \
+            .add("FECHA_NAC", StringType(), True) \
+            .add("UBIGEO_NAC", StringType(), True) \
+            .add("UBIGEO_DIR", StringType(), True) \
+            .add("DIRECCION", StringType(), True) \
+            .add("SEXO", StringType(), True) \
+            .add("EST_CIVIL", StringType(), True) \
+            .add("MADRE", StringType(), True) \
+            .add("PADRE", StringType(), True)
+
+        try:
+            self.df = self.spark.read \
+                .option("delimiter", "|") \
+                .schema(schema) \
+                .csv("/data/reniec.txt") \
+                .repartition("DNI")
+        except Exception as e:
+            print(f"Error al leer el archivo: {e}")
+    
+    def stop_spark(self):
+        if self.spark:
+            self.spark.stop()
+            print("Sesión de Spark detenida.")
     
     def ConsultaDNI(self,dni):
         # Filtra el DataFrame para obtener la fila con el DNI buscado
@@ -164,60 +205,4 @@ class ListBookWindow():
         DtaTuplas_Plantilla = merged_df2.values.tolist()
         return DtaTuplas_Plantilla
        
-        
-    # Inicializa una sesión de Spark
-    #spark = SparkSession.builder \
-    #    .appName("Lectura de archivo") \
-    #    .getOrCreate()
-    
-   
 
-    # Inicializa Spark
-    spark = SparkSession.builder \
-        .appName("Lectura de archivo") \
-        .config("spark.executor.memory", "4g") \
-        .config("spark.driver.memory", "2g") \
-        .config("spark.executor.cores", "2") \
-        .config("spark.sql.shuffle.partitions", "10") \
-        .getOrCreate()
-
-    # Define el esquema de tu DataFrame
-    schema = StructType() \
-        .add("DNI", StringType(), True) \
-        .add("AP_PAT", StringType(), True) \
-        .add("AP_MAT", StringType(), True) \
-        .add("NOMBRES", StringType(), True) \
-        .add("FECHA_NAC", StringType(), True) \
-        .add("FCH_INSCRIPCION", StringType(), True) \
-        .add("FCH_EMISION", StringType(), True) \
-        .add("FCH_CADUCIDAD", StringType(), True) \
-        .add("UBIGEO_NAC", StringType(), True) \
-        .add("UBIGEO_DIR", StringType(), True) \
-        .add("DIRECCION", StringType(), True) \
-        .add("SEXO", StringType(), True) \
-        .add("EST_CIVIL", StringType(), True) \
-        .add("DIG_RUC", StringType(), True) \
-        .add("MADRE", StringType(), True) \
-        .add("PADRE", StringType(), True)
-
-    # Verifica el contenido del directorio /data
-    try:
-        print("Contenido de /data:")
-        print(spark.sparkContext.wholeTextFiles("/data/*").keys().collect())
-    except Exception as e:
-        print(f"Error al acceder a /data: {e}")
-
-    # Lee el archivo
-    try:
-        df = spark.read \
-            .option("delimiter", "|") \
-            .schema(schema) \
-            .csv("/data/reniec.txt") \
-            .repartition("DNI")
-
-        # Muestra el esquema y una muestra de los datos
-        # df.printSchema()
-        # df.show(10)
-
-    except Exception as e:
-        print(f"Error al leer el archivo: {e}")
