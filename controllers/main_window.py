@@ -3,7 +3,6 @@ import os
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
 
-
 class ListBookWindow():
     
     def ConsultaDNI(self,dni):
@@ -171,6 +170,8 @@ class ListBookWindow():
     #    .appName("Lectura de archivo") \
     #    .getOrCreate()
     
+   
+
     # Inicializa Spark
     spark = SparkSession.builder \
         .appName("Lectura de archivo") \
@@ -215,8 +216,22 @@ class ListBookWindow():
             .repartition("DNI")
 
         # Muestra el esquema y una muestra de los datos
-        #df.printSchema()
-        #df.show(10)
+        # df.printSchema()
+        # df.show(10)
 
     except Exception as e:
         print(f"Error al leer el archivo: {e}")
+
+    
+    # Detener el contexto de Spark si ya está en ejecución
+    try:
+        spark.stop()
+    except Exception as e:
+        print(f"Error al detener el contexto de Spark: {e}")
+
+    # Si usas acumuladores, inicialízalos aquí (ejemplo):
+    # my_accumulator = spark.sparkContext.accumulator(0)
+
+    # Después de esto, puedes continuar con el resto de tu lógica
+
+    
