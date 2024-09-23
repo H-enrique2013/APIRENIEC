@@ -6,7 +6,7 @@ from pyspark.sql.types import StructType, StructField, StringType
 class ListBookWindow():
 
     def __init__(self):
-        self.df_inicial = None  # Inicializa el atributo df
+        
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
             .config("spark.executor.memory", "8g") \
