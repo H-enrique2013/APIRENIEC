@@ -57,9 +57,10 @@ class ConsultaSpark:
 class ListBookWindow():
 
     def ConsultaDNI(self,dni):
+        consultaSpark = ConsultaSpark()
 
         #DataFrame
-        self.df=ConsultaSpark.realizar_consulta()
+        self.df=consultaSpark.realizar_consulta()
         # Filtra el DataFrame para obtener la fila con el DNI buscado
         resultado = self.df.filter(self.df["DNI"] == dni)
         # Selecciona solo las columnas requeridas
@@ -70,9 +71,10 @@ class ListBookWindow():
         return resultado_tuplas
 
     def ConsultaNombresApellidos(self, Nom, Ap_pat, Ap_mat):
+        consultaSpark = ConsultaSpark()
 
         #DataFrame
-        self.df=ConsultaSpark.realizar_consulta()
+        self.df=consultaSpark.realizar_consulta()
         # Filtra el DataFrame para obtener la fila con el DNI buscado
         #print("DATAFRAME RESULTADOS"+str(self.df.count()))
         if Nom != "" and Ap_pat != "" and Ap_mat != "":
@@ -92,9 +94,9 @@ class ListBookWindow():
     #Funcion carga masiva dde DNI
     
     def CargaMasivaDNI(self,lista_dni):
-
+        consultaSpark = ConsultaSpark()
         #DataFrame
-        self.df=ConsultaSpark.realizar_consulta()
+        self.df=consultaSpark.realizar_consulta()
         # Filtrar el DataFrame por los números de DNI especificados
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas
@@ -106,9 +108,9 @@ class ListBookWindow():
     
 
     def CargaMasivaPlantillaDNI(self,lista_dni):
-
+        consultaSpark = ConsultaSpark()
         #DataFrame
-        self.df=ConsultaSpark.realizar_consulta()
+        self.df=consultaSpark.realizar_consulta()
         # Filtrar el DataFrame por los números de DNI especificados
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas
