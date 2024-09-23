@@ -9,10 +9,10 @@ class ListBookWindow():
         self.df = None  # Inicializa el atributo df
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
-            .config("spark.executor.memory", "4g") \
-            .config("spark.driver.memory", "2g") \
-            .config("spark.executor.cores", "2") \
-            .config("spark.sql.shuffle.partitions", "10") \
+            .config("spark.executor.memory", "8g") \
+            .config("spark.driver.memory", "4g") \
+            .config("spark.executor.cores", "4") \
+            .config("spark.sql.shuffle.partitions", "50") \
             .getOrCreate()
         
         self.load_data()  # Cargar datos al inicializar la clase
