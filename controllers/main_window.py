@@ -15,6 +15,8 @@ class ListBookWindow():
             .config("spark.sql.shuffle.partitions", "50") \
             .getOrCreate()
         
+        self.cached_data = None
+
     def realizar_consulta(self):
         # Si ya existe un DataFrame en caché, reutilizarlo
         if self.cached_data:
