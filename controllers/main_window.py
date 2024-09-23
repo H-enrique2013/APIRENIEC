@@ -53,7 +53,7 @@ class ListBookWindow():
     def ConsultaDNI(self,dni):
 
         #DataFrame
-        self.df=self.realizar_consulta()
+        self.df=self.realizar_consulta(self)
         # Filtra el DataFrame para obtener la fila con el DNI buscado
         resultado = self.df.filter(self.df["DNI"] == dni)
         # Selecciona solo las columnas requeridas
