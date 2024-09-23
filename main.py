@@ -32,7 +32,7 @@ def consultaDNI_Tipo1():
         resultado = list_book_window.ConsultaDNI(n_dni)
         
         # Realiza operaciones con list_book_window...
-        list_book_window.stop_spark()
+        #list_book_window.stop_spark()
 
         
         # Verificar si el resultado es válido
