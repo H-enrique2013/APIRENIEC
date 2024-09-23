@@ -36,7 +36,7 @@ class ListBookWindow():
             self.df = self.spark.read \
                 .option("delimiter", "|") \
                 .schema(schema) \
-                .csv("/data/reniecprueba.txt") \
+                .csv("/data/reniec.txt") \
                 .repartition("DNI")
         except Exception as e:
             print(f"Error al leer el archivo: {e}")
