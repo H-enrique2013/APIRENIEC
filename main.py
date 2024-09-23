@@ -57,8 +57,6 @@ def consultaDNI_Tipo2():
         
         # Consultar nombres y apellidos
         resultado = list_book_window.ConsultaNombresApellidos(Nom, Ap_Pat, Ap_Mat)
-        
-        
         # Verificar si el resultado es válido
         if resultado:
             return jsonify(resultado), 200

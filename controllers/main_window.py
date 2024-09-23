@@ -15,8 +15,6 @@ class ListBookWindow():
             .config("spark.sql.shuffle.partitions", "50") \
             .getOrCreate()
         
-        self.cached_data = None
-
     def realizar_consulta(self):
         # Si ya existe un DataFrame en caché, reutilizarlo
         if self.cached_data:
@@ -53,7 +51,7 @@ class ListBookWindow():
     def ConsultaDNI(self,dni):
 
         #DataFrame
-        self.df=self.realizar_consulta(self)
+        self.df=self.realizar_consulta()
         # Filtra el DataFrame para obtener la fila con el DNI buscado
         resultado = self.df.filter(self.df["DNI"] == dni)
         # Selecciona solo las columnas requeridas
