@@ -3,10 +3,11 @@ import os
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType
 
-class ListBookWindow():
 
+class ConsultaSpark:
     def __init__(self):
-        
+
+        self.df_inicial=None
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
             .config("spark.executor.memory", "8g") \
@@ -49,11 +50,16 @@ class ListBookWindow():
             return self.cached_data
         except Exception as e:
             print(f"Error al leer el archivo: {e}")
-    
+
+
+
+
+class ListBookWindow():
+
     def ConsultaDNI(self,dni):
 
         #DataFrame
-        self.df=self.realizar_consulta()
+        self.df=ConsultaSpark.realizar_consulta()
         # Filtra el DataFrame para obtener la fila con el DNI buscado
         resultado = self.df.filter(self.df["DNI"] == dni)
         # Selecciona solo las columnas requeridas
@@ -66,7 +72,7 @@ class ListBookWindow():
     def ConsultaNombresApellidos(self, Nom, Ap_pat, Ap_mat):
 
         #DataFrame
-        self.df=self.realizar_consulta()
+        self.df=ConsultaSpark.realizar_consulta()
         # Filtra el DataFrame para obtener la fila con el DNI buscado
         #print("DATAFRAME RESULTADOS"+str(self.df.count()))
         if Nom != "" and Ap_pat != "" and Ap_mat != "":
@@ -88,7 +94,7 @@ class ListBookWindow():
     def CargaMasivaDNI(self,lista_dni):
 
         #DataFrame
-        self.df=self.realizar_consulta()
+        self.df=ConsultaSpark.realizar_consulta()
         # Filtrar el DataFrame por los números de DNI especificados
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas
@@ -102,7 +108,7 @@ class ListBookWindow():
     def CargaMasivaPlantillaDNI(self,lista_dni):
 
         #DataFrame
-        self.df=self.realizar_consulta()
+        self.df=ConsultaSpark.realizar_consulta()
         # Filtrar el DataFrame por los números de DNI especificados
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas

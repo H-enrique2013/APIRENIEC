@@ -1,4 +1,4 @@
-from controllers.main_window import ListBookWindow
+from controllers.main_window import ListBookWindow ,ConsultaSpark
 from flask import Flask, request, jsonify,send_from_directory,render_template,redirect
 from werkzeug.utils import secure_filename
 import pandas as pd
@@ -6,6 +6,7 @@ import pandas as pd
 
 # Crear una instancia de ListBookWindow
 list_book_window = ListBookWindow()
+consultaSpark=ConsultaSpark()
 
 app = Flask(__name__, template_folder='templates')
 
@@ -143,8 +144,16 @@ def favicon():
 # Método para detener Spark cuando se cierra la aplicación Flask
 @app.teardown_appcontext
 def shutdown_spark(exception=None):
-    list_book_window.spark.stop()
-    print("Sesión de Spark detenida.")
+    try:
+        consultaSpark.spark.stop()
+        print("Sesión de Spark detenida.")
+    except Exception as e:
+        print(f"Error al detener la sesión de Spark: {e}")
+    
+    if exception:
+        print(f"Se produjo una excepción durante el cierre: {exception}")
+
+
 
 
 if __name__ == "__main__":
