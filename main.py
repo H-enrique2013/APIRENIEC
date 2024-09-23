@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify,send_from_directory,render_template,re
 from werkzeug.utils import secure_filename
 import pandas as pd
 
+
 # Crear una instancia de ListBookWindow
 list_book_window = ListBookWindow()
 
@@ -31,10 +32,6 @@ def consultaDNI_Tipo1():
         # Consultar el DNI en el método
         resultado = list_book_window.ConsultaDNI(n_dni)
         
-        # Realiza operaciones con list_book_window...
-        #list_book_window.stop_spark()
-
-        
         # Verificar si el resultado es válido
         if resultado:
             return jsonify(resultado), 200
@@ -60,8 +57,7 @@ def consultaDNI_Tipo2():
         
         # Consultar nombres y apellidos
         resultado = list_book_window.ConsultaNombresApellidos(Nom, Ap_Pat, Ap_Mat)
-        # Realiza operaciones con list_book_window...
-        #list_book_window.stop_spark()
+        
         
         # Verificar si el resultado es válido
         if resultado:
@@ -93,8 +89,6 @@ def cargamasivaDNI_Tipo1():
 
             # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
             resultado = list_book_window.seleccionar_archivo_xlsx(df)
-            # Realiza operaciones con list_book_window...
-            #list_book_window.stop_spark()
             
             # Verificar si el resultado es válido
             if resultado:
@@ -129,9 +123,6 @@ def cargamasivaplantillaDNI_Tipo1():
 
             # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
             plantilla= list_book_window.seleccionar_archivo_Plantilla_xlsx(df)
-            # Realiza operaciones con list_book_window...
-            #list_book_window.stop_spark()
-            
             # Verificar si el resultado es válido
             if plantilla:
                 return jsonify(plantilla), 200
@@ -145,9 +136,18 @@ def cargamasivaplantillaDNI_Tipo1():
         return jsonify({"error": "Formato de archivo no soportado"}), 400
     
 
+
 @app.route('/geopandasIcon.ico')
 def favicon():
     return send_from_directory('static', 'geopandasIcon.ico')
+
+
+# Método para detener Spark cuando se cierra la aplicación Flask
+@app.teardown_appcontext
+def shutdown_spark(exception=None):
+    list_book_window.spark.stop()
+    print("Sesión de Spark detenida.")
+
 
 if __name__ == "__main__":
     try:
