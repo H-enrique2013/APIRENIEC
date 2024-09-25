@@ -33,7 +33,7 @@
         }
         
         h2 {
-            color: red;
+            color: rgb(55,55,55);
         }
         
         p span {
@@ -41,11 +41,11 @@
         }
         
         p span.url {
-            color: red;
+            color: rgb(55, 55, 55);
         }
         
         p span.json-label {
-            color: green;
+            color:rgb(246, 5, 5);
         }
     </style>
 </head>
@@ -54,11 +54,11 @@
         <h1>API CONSULTA RENIEC</h1>
     </div>
     <br>
-    <h2>Url de los Endpoint 1</h2>
+    <h2>Url del Endpoint-Consulta Individual</h2>
     <div class="contenido">
         <p>
             <span class="json-label">File HTML:</span>
-            <span class="url">https://apireniec-am5e.onrender.com/consultaDNI-Tipo1</span>
+            <span class="url">https://apireniec-am5e.onrender.com/consultaxDNINombresApellidos</span>
         </p>
        
     </div>
@@ -69,42 +69,20 @@
             <span class="json-label">JSON de ejemplo:</span>
         </p>
         <pre>
-            {
-                "N_DNI": "04437283"
-            
+            {   "Typeconsulta": "0",  <span style="color: greenyellow;">// El 0 es para una consulta por DNI</span>
+                "N_DNI": "12345678",  <span style="color: greenyellow;">// Número de DNI</span>
+                "Nombres": "CARLOS",  <span style="color: greenyellow;">// Nombre del usuario</span>
+                "Ap_Paterno": "SANCHEZ",  <span style="color: greenyellow;">// Apellido paterno</span>
+                "Ap_Materno": "ROJAS"  <span style="color: greenyellow;">// Apellido materno</span>
             }
         </pre>
     </div>
     <br>
-    <h2>Url de los Endpoint 2</h2>
+    <h2>Url de los Endpoint-Consulta Masiva</h2>
     <div class="contenido">
         <p>
             <span class="json-label">File HTML:</span>
-            <span class="url">https://apireniec-am5e.onrender.com/consultaDNI-Tipo2</span>
-        </p>
-       
-    </div>
-    <br>
-    <h2>Parámetros para el método POST</h2>
-    <div class="Contenido">
-        <p>
-            <span class="json-label">JSON de ejemplo:</span>
-        </p>
-        <pre>
-            {
-                "Nombres": "CARLOS",
-                "Ap_Paterno": "ABAD",
-                "Ap_Materno": "WON"
-            
-            }
-        </pre>
-    </div>
-    <br>
-    <h2>Url de los Endpoint 3</h2>
-    <div class="contenido">
-        <p>
-            <span class="json-label">File HTML:</span>
-            <span class="url">https://apireniec-am5e.onrender.com/cargamasivaDNI-Tipo1</span>
+            <span class="url">https://apireniec-am5e.onrender.com/cargamasivaDNI</span>
         </p>
        
     </div>
@@ -121,7 +99,7 @@
         </pre>
     </div>
     <br>
-    <h2>Url de los Endpoint 4</h2>
+    <h2>Url de los Endpoint-Consulta Plantilla Padron</h2>
     <div class="contenido">
         <p>
             <span class="json-label">File HTML:</span>

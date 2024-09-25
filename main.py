@@ -14,51 +14,33 @@ def index():
 
 #Métodos POST
 
-@app.route('/consultaDNI-Tipo1', methods=['POST'])
-def consultaDNI_Tipo1():
+@app.route('/consultaxDNINombresApellidos', methods=['POST'])
+def consultaxDNINombresApellidos():
     try:
         data = request.get_json()
-        n_dni = data.get('N_DNI')
-        
-        # Validación del DNI
-        if not n_dni or len(n_dni) != 8 or not n_dni.isdigit():
-            return jsonify({"error": "DNI inválido. Debe ser un número de 8 dígitos"}), 400
-        
-        # Consultar el DNI en el método
-        resultado = list_book_window.ConsultaDNI(n_dni)
-        
-        # Realiza operaciones con list_book_window...
-        #list_book_window.stop_spark()
-
-        
-        # Verificar si el resultado es válido
-        if resultado:
-            return jsonify(resultado), 200
-        else:
-            return jsonify({"error": "No se encontró información para el DNI proporcionado"}), 404
-    except Exception as e:
-        return jsonify({"error": f"Ha ocurrido un error: {str(e)}"}), 500
-
-
-@app.route('/consultaDNI-Tipo2', methods=['POST'])
-def consultaDNI_Tipo2():
-    try:
-        data = request.get_json()
+        Typeconsulta = data.get('Typeconsulta', '')#Si es 0 busca por DNI y si es 1 busca por nomb y apellidos
+        n_dni = data.get('N_DNI', '')
         Nom = data.get('Nombres', '').upper()  # Convertir a mayúsculas
         Ap_Pat = data.get('Ap_Paterno', '').upper()  # Convertir a mayúsculas
         Ap_Mat = data.get('Ap_Materno', '').upper()  # Convertir a mayúsculas
+
+        if Typeconsulta!='0' or Typeconsulta!='1':
+            return jsonify({"error":"Typeconsulta debe ser solo 0 o 1"})
         
-        # Validación de campos:
-        # Caso 1: Todos los campos deben ser diferentes de vacío
-        # Caso 2: Nom puede estar vacío, pero Ap_Pat y Ap_Mat deben ser diferentes de vacío
-        if (not Nom and (not Ap_Pat or not Ap_Mat)) or (not Ap_Pat or not Ap_Mat):
-            return jsonify({"error": "Debe ingresar Ap_Paterno y Ap_Materno, y opcionalmente Nombres"}), 400
+        if Typeconsulta=='0':
+            # Validación del DNI
+            if not n_dni or len(n_dni) != 8 or not n_dni.isdigit():
+                    return jsonify({"error": "DNI inválido. Debe ser un número de 8 dígitos"}), 400
+        elif Typeconsulta=='1':
+            # Validación de campos:
+            # Caso 1: Todos los campos deben ser diferentes de vacío
+            # Caso 2: Nom puede estar vacío, pero Ap_Pat y Ap_Mat deben ser diferentes de vacío
+            if (not Nom and (not Ap_Pat or not Ap_Mat)) or (not Ap_Pat or not Ap_Mat):
+                return jsonify({"error": "Debe ingresar Ap_Paterno y Ap_Materno, y opcionalmente Nombres"}), 400
         
         # Consultar nombres y apellidos
-        resultado = list_book_window.ConsultaNombresApellidos(Nom, Ap_Pat, Ap_Mat)
-        # Realiza operaciones con list_book_window...
-        #list_book_window.stop_spark()
-        
+        resultado = list_book_window.ConsultaxDNINombresApellidos(Typeconsulta,n_dni,Nom, Ap_Pat, Ap_Mat)
+       
         # Verificar si el resultado es válido
         if resultado:
             return jsonify(resultado), 200
@@ -69,8 +51,9 @@ def consultaDNI_Tipo2():
 
 
 
-@app.route('/cargamasivaDNI-Tipo1', methods=['POST'])
-def cargamasivaDNI_Tipo1():
+@app.route('/cargamasivaDNI', methods=['POST'])
+def cargamasivaDNI():
+
     if 'archivo_excel' not in request.files:
         return jsonify({"error": "No se ha subido ningún archivo"}), 400
 
@@ -105,8 +88,9 @@ def cargamasivaDNI_Tipo1():
         return jsonify({"error": "Formato de archivo no soportado"}), 400
 
 
-@app.route('/cargamasivaplatillaDNI-Tipo1', methods=['POST'])
-def cargamasivaplantillaDNI_Tipo1():
+@app.route('/cargamasivaplatillaDNI', methods=['POST'])
+def cargamasivaplantillaDNI():
+
     if 'archivoplantilla_excel' not in request.files:
         return jsonify({"error": "No se ha subido ningún archivo"}), 400
 
@@ -143,7 +127,7 @@ def cargamasivaplantillaDNI_Tipo1():
 
 @app.route('/geopandasIcon.ico')
 def favicon():
-    return send_from_directory('static', 'geopandasIcon.ico')
+    return send_from_directory('static', 'Sispad.ico')
 
 if __name__ == "__main__":
     try:
