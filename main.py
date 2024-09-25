@@ -24,8 +24,8 @@ def consultaxDNINombresApellidos():
         Ap_Pat = data.get('Ap_Paterno', '').upper()  # Convertir a mayúsculas
         Ap_Mat = data.get('Ap_Materno', '').upper()  # Convertir a mayúsculas
 
-        if Typeconsulta!='0' or Typeconsulta!='1':
-            return jsonify({"error":"Typeconsulta debe ser solo 0 o 1:{Typeconsulta}"})
+        if Typeconsulta!='0' and Typeconsulta!='1':
+            return jsonify({"error":f"Typeconsulta debe ser solo 0 o 1: {Typeconsulta}"})
         
         if Typeconsulta=='0':
             # Validación del DNI
