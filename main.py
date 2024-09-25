@@ -18,7 +18,7 @@ def index():
 def consultaxDNINombresApellidos():
     try:
         data = request.get_json()
-        Typeconsulta = str(data.get('Typeconsulta', ''))#Si es 0 busca por DNI y si es 1 busca por nomb y apellidos
+        Typeconsulta = data.get('Typeconsulta', '')#Si es 0 busca por DNI y si es 1 busca por nomb y apellidos
         n_dni = data.get('N_DNI', '')
         Nom = data.get('Nombres', '').upper()  # Convertir a mayúsculas
         Ap_Pat = data.get('Ap_Paterno', '').upper()  # Convertir a mayúsculas
