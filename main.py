@@ -125,9 +125,9 @@ def cargamasivaplantillaDNI():
         return jsonify({"error": "Formato de archivo no soportado"}), 400
     
 
-@app.route('/geopandasIcon.ico')
+@app.route('/Sispad.ico')
 def favicon():
-    return send_from_directory('static', 'Sispad.ico')
+    return send_from_directory('static', 'Sispad.ico', as_attachment=False)
 
 if __name__ == "__main__":
     try:

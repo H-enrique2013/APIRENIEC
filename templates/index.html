@@ -6,118 +6,133 @@
     <title>API Render Coordinates</title>
     <style>
         body {
-            background-color: #f5eeee; /* Color de fondo claro */
-            color: white; /* Color de texto */
-            font-family: Arial, sans-serif; /* Fuente del texto */
-            padding: 20px; /* Espaciado interior */
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
         }
-        
-        .Titulo {
-            background-color: #fc0808;
-            color: #f5eeee;
-            text-align: center; /* Para centrar el contenido */
-            padding: 10px; /* Espaciado interior */
-            border-radius: 5px; /* Bordes redondeados */
+        /* Flexbox para alinear todos los bloques horizontalmente */
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: nowrap;
+            gap: 20px;
         }
-        
-        .Contenido {
-            background-color: #827f7f; /* Color de fondo oscuro para el div */
-            padding: 15px; /* Espaciado interior del div */
-            margin-top: 20px; /* Margen superior */
-            border-radius: 5px; /* Bordes redondeados */
+        .block {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+        .block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
         pre {
-            white-space: pre-wrap; /* Envolver el contenido del pre */
-            color: #f5eeee; /* Color del texto dentro del pre */
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            color: #2c3e50;
         }
-        
+        .Titulo h1 {
+            margin: 0;
+            background-color: #d32f2f;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
         h2 {
-            color: rgb(55,55,55);
+            color: #d32f2f;
         }
-        
-        p span {
+        .json-label {
             font-weight: bold;
+            color: #444;
         }
-        
-        p span.url {
-            color: rgb(55, 55, 55);
+        .url {
+            color: #1976d2;
+            font-family: monospace;
         }
-        
-        p span.json-label {
-            color:rgb(246, 5, 5);
+        span {
+            font-family: monospace;
+        }
+        /* Comentarios en el código JSON */
+        .json-comment {
+            color: #43a047;
+            font-style: italic;
         }
     </style>
 </head>
+
 <body>
     <div class="Titulo">
         <h1>API CONSULTA RENIEC</h1>
     </div>
     <br>
-    <h2>Url del Endpoint-Consulta Individual</h2>
-    <div class="contenido">
-        <p>
-            <span class="json-label">File HTML:</span>
-            <span class="url">https://apireniec-am5e.onrender.com/consultaxDNINombresApellidos</span>
-        </p>
-       
-    </div>
-    <br>
-    <h2>Parámetros para el método POST</h2>
-    <div class="Contenido">
-        <p>
-            <span class="json-label">JSON de ejemplo:</span>
-        </p>
-        <pre>
-            {   "Typeconsulta": "0",  <span style="color: greenyellow;">// El 0 es para una consulta por DNI</span>
-                "N_DNI": "12345678",  <span style="color: greenyellow;">// Número de DNI</span>
-                "Nombres": "CARLOS",  <span style="color: greenyellow;">// Nombre del usuario</span>
-                "Ap_Paterno": "SANCHEZ",  <span style="color: greenyellow;">// Apellido paterno</span>
-                "Ap_Materno": "ROJAS"  <span style="color: greenyellow;">// Apellido materno</span>
-            }
-        </pre>
-    </div>
-    <br>
-    <h2>Url de los Endpoint-Consulta Masiva</h2>
-    <div class="contenido">
-        <p>
-            <span class="json-label">File HTML:</span>
-            <span class="url">https://apireniec-am5e.onrender.com/cargamasivaDNI</span>
-        </p>
-       
-    </div>
-    <br>
-    <h2>Parámetros para el método POST</h2>
-    <div class="Contenido">
-        <p>
-            <span class="json-label">JSON de ejemplo:</span>
-        </p>
-        <pre>
-            {
-                "archivo_excel": ejemploarchivo.xlsx
-            }
-        </pre>
-    </div>
-    <br>
-    <h2>Url de los Endpoint-Consulta Plantilla Padron</h2>
-    <div class="contenido">
-        <p>
-            <span class="json-label">File HTML:</span>
-            <span class="url">https://apireniec-am5e.onrender.com/cargamasivaplatillaDNI-Tipo1</span>
-        </p>
-       
-    </div>
-    <br>
-    <h2>Parámetros para el método POST</h2>
-    <div class="Contenido">
-        <p>
-            <span class="json-label">JSON de ejemplo:</span>
-        </p>
-        <pre>
-            {
-                "archivoplantilla_excel": ejemploarchivo.xlsx
-            }
-        </pre>
+    
+    <div class="flex-container">
+        <!-- Primer Bloque -->
+        <div class="block">
+            <h2>Url del Endpoint-Consulta Individual</h2>
+            <p>
+                <span class="json-label">File HTML:</span>
+                <span class="url">https://apireniec-am5e.onrender.com/consultaxDNINombresApellidos</span>
+            </p>
+            <h2>Parámetros para el método POST</h2>
+            <p>
+                <span class="json-label">JSON de ejemplo:</span>
+            </p>
+            <pre>
+                {   "Typeconsulta": "0",  <span class="json-comment">// El 0 es para una consulta por DNI</span>
+                    "N_DNI": "12345678",  <span class="json-comment">// Número de DNI</span>
+                    "Nombres": "CARLOS",  <span class="json-comment">// Nombre del usuario</span>
+                    "Ap_Paterno": "SANCHEZ",  <span class="json-comment">// Apellido paterno</span>
+                    "Ap_Materno": "ROJAS"  <span class="json-comment">// Apellido materno</span>
+                }
+            </pre>
+        </div>
+
+        <!-- Segundo Bloque -->
+        <div class="block">
+            <h2>Url de los Endpoint-Consulta Masiva</h2>
+            <p>
+                <span class="json-label">File HTML:</span>
+                <span class="url">https://apireniec-am5e.onrender.com/cargamasivaDNI</span>
+            </p>
+            <h2>Parámetros para el método POST</h2>
+            <p>
+                <span class="json-label">JSON de ejemplo:</span>
+            </p>
+            <pre>
+                {
+                    "archivo_excel": "ejemploarchivo.xlsx"
+                }
+            </pre>
+        </div>
+
+        <!-- Tercer Bloque -->
+        <div class="block">
+            <h2>Url de los Endpoint-Consulta Plantilla Padron</h2>
+            <p>
+                <span class="json-label">File HTML:</span>
+                <span class="url">https://apireniec-am5e.onrender.com/cargamasivaplatillaDNI</span>
+            </p>
+            <h2>Parámetros para el método POST</h2>
+            <p>
+                <span class="json-label">JSON de ejemplo:</span>
+            </p>
+            <pre>
+                {
+                    "archivoplantilla_excel": "ejemploarchivo.xlsx"
+                }
+            </pre>
+        </div>
     </div>
 </body>
 </html>
