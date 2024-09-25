@@ -13,20 +13,24 @@
         /* Flexbox para alinear todos los bloques horizontalmente */
         .flex-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: flex-start;
             flex-wrap: nowrap;
-            gap: 20px;
+            gap: 20px; /* Espacio entre los bloques */
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .block {
-            flex: 1;
-            padding: 15px;
             border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
-            text-align: left; /* Asegura la alineación a la izquierda en cada bloque */
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1; /* Hace que todos los bloques ocupen el mismo ancho */
+            min-width: 300px; /* Evita que los bloques sean demasiado pequeños */
+            max-width: 30%; /* Limita el ancho máximo de los bloques */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .block:hover {
             transform: translateY(-5px);
@@ -39,7 +43,6 @@
             overflow-x: auto;
             font-family: monospace;
             color: #2c3e50;
-            text-align: left; /* Asegura la alineación a la izquierda */
         }
         .Titulo h1 {
             margin: 0;
@@ -94,12 +97,12 @@
                 <span class="json-label">JSON de ejemplo:</span>
             </p>
             <pre>
-                {   "Typeconsulta": "0",  <span class="json-comment">// El 0 es para una consulta por DNI</span>
-                    "N_DNI": "12345678",  <span class="json-comment">// Número de DNI</span>
-                    "Nombres": "CARLOS",  <span class="json-comment">// Nombre del usuario</span>
-                    "Ap_Paterno": "SANCHEZ",  <span class="json-comment">// Apellido paterno</span>
-                    "Ap_Materno": "ROJAS"  <span class="json-comment">// Apellido materno</span>
-                }
+    {   "Typeconsulta": "0",  <span class="json-comment">// El 0 es para una consulta por DNI</span>
+        "N_DNI": "12345678",  <span class="json-comment">// Número de DNI</span>
+        "Nombres": "",  <span class="json-comment">// Nombre del usuario</span>
+        "Ap_Paterno": "",  <span class="json-comment">// Apellido paterno</span>
+        "Ap_Materno": ""  <span class="json-comment">// Apellido materno</span>
+    }
             </pre>
         </div>
 
@@ -115,9 +118,9 @@
                 <span class="json-label">JSON de ejemplo:</span>
             </p>
             <pre>
-                {
-                    "archivo_excel": "ejemploarchivo.xlsx"
-                }
+    {
+        "archivo_excel": "ejemploarchivo.xlsx"
+    }
             </pre>
         </div>
 
@@ -133,9 +136,9 @@
                 <span class="json-label">JSON de ejemplo:</span>
             </p>
             <pre>
-                {
-                    "archivoplantilla_excel": "ejemploarchivo.xlsx"
-                }
+    {
+        "archivoplantilla_excel": "ejemploarchivo.xlsx"
+    }
             </pre>
         </div>
     </div>
