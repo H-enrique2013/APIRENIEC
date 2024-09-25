@@ -14,8 +14,8 @@ def index():
 
 #Métodos POST
 
-@app.route('/consultaxDNINombresApellidos', methods=['POST'])
-def consultaxDNINombresApellidos():
+@app.route('/consultaDNINombresApellidos', methods=['POST'])
+def consultaDNINombresApellidos():
     try:
         data = request.get_json()
         Typeconsulta = data.get('Typeconsulta', '')#Si es 0 busca por DNI y si es 1 busca por nomb y apellidos

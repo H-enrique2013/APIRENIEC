@@ -6,7 +6,6 @@ from pyspark.sql.types import StructType, StructField, StringType
 
 class ConsultaSpark:
     def __init__(self):
-        self.df_inicial=None
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
             .config("spark.executor.memory", "8g") \
@@ -15,15 +14,9 @@ class ConsultaSpark:
             .config("spark.sql.shuffle.partitions", "50") \
             .getOrCreate()
         
-        self.cached_data = None
-
     def realizar_consulta(self):
         # Si ya existe un DataFrame en cachÃ©, reutilizarlo
-        '''
-        if self.cached_data:
-            print("Usando datos en cachÃ©")
-            return self.cached_data
-        '''
+        
         schema = StructType() \
             .add("DNI", StringType(), True) \
             .add("AP_PAT", StringType(), True) \
@@ -42,19 +35,20 @@ class ConsultaSpark:
             self.df_inicial = self.spark.read \
                 .option("delimiter", "|") \
                 .schema(schema) \
-                .csv("/reniecprueba.txt") \
+                .csv("reniec.txt") \
                 .repartition("DNI")
             # Almacenar el DataFrame en cachÃ©
-            self.cached_data = self.df_inicial.cache()
+            #self.cached_data = self.df_inicial.cache()
+            # Muestra las primeras 5 filas
             # Retornar los datos
-            return self.cached_data
+            return self.df_inicial
         except Exception as e:
             print(f"Error al leer el archivo: {e}")
 
 
 class ListBookWindow():
 
-    def ConsultaxDNINombresApellidos(self,typeconsulta,dni, Nom, Ap_pat, Ap_mat):
+    def ConsultaxDNINombresApellidos(self, typeconsulta, dni, Nom, Ap_pat, Ap_mat):
         consultaSpark = ConsultaSpark()
         #DataFrame
         self.df=consultaSpark.realizar_consulta()
