@@ -6,7 +6,6 @@ from pyspark.sql.types import StructType, StructField, StringType
 
 class ConsultaSpark:
     def __init__(self):
-
         self.df_inicial=None
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
@@ -20,10 +19,11 @@ class ConsultaSpark:
 
     def realizar_consulta(self):
         # Si ya existe un DataFrame en cachÃ©, reutilizarlo
+        '''
         if self.cached_data:
             print("Usando datos en cachÃ©")
             return self.cached_data
-        
+        '''
         schema = StructType() \
             .add("DNI", StringType(), True) \
             .add("AP_PAT", StringType(), True) \
@@ -42,7 +42,7 @@ class ConsultaSpark:
             self.df_inicial = self.spark.read \
                 .option("delimiter", "|") \
                 .schema(schema) \
-                .csv("/data/reniec.txt") \
+                .csv("/reniecprueba.txt") \
                 .repartition("DNI")
             # Almacenar el DataFrame en cachÃ©
             self.cached_data = self.df_inicial.cache()
