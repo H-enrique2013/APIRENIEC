@@ -6,16 +6,16 @@ from pyspark.sql.types import StructType, StructField, StringType
 
 class ConsultaSpark:
     def __init__(self):
+
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
             .config("spark.executor.memory", "8g") \
             .config("spark.driver.memory", "4g") \
             .config("spark.executor.cores", "4") \
-            .config("spark.sql.shuffle.partitions", "50") \
+            .config("spark.sql.shuffle.partitions", "10") \
             .getOrCreate()
         
     def realizar_consulta(self):
-        # Si ya existe un DataFrame en cachÃ©, reutilizarlo
         
         schema = StructType() \
             .add("DNI", StringType(), True) \
@@ -35,11 +35,9 @@ class ConsultaSpark:
             self.df_inicial = self.spark.read \
                 .option("delimiter", "|") \
                 .schema(schema) \
-                .csv("reniec.txt") \
+                .csv("/data/reniec.txt") \
                 .repartition("DNI")
-            # Almacenar el DataFrame en cachÃ©
-            #self.cached_data = self.df_inicial.cache()
-            # Muestra las primeras 5 filas
+            
             # Retornar los datos
             return self.df_inicial
         except Exception as e:
@@ -47,11 +45,13 @@ class ConsultaSpark:
 
 
 class ListBookWindow():
+    def __init__(self):
+
+        self.consultaSpark = ConsultaSpark()
+        self.df=self.consultaSpark.realizar_consulta() 
 
     def ConsultaxDNINombresApellidos(self, typeconsulta, dni, Nom, Ap_pat, Ap_mat):
-        consultaSpark = ConsultaSpark()
-        #DataFrame
-        self.df=consultaSpark.realizar_consulta()
+        
         if typeconsulta=='0':
             resultado = self.df.filter(self.df["DNI"] == dni)
         elif typeconsulta=='1':
@@ -72,9 +72,7 @@ class ListBookWindow():
     #Funcion carga masiva dde DNI
     
     def CargaMasivaDNI(self,lista_dni):
-        consultaSpark = ConsultaSpark()
-        #DataFrame
-        self.df=consultaSpark.realizar_consulta()
+        
         # Filtrar el DataFrame por los números de DNI especificados
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas
@@ -86,9 +84,7 @@ class ListBookWindow():
     
 
     def CargaMasivaPlantillaDNI(self,lista_dni):
-        consultaSpark = ConsultaSpark()
-        #DataFrame
-        self.df=consultaSpark.realizar_consulta()
+        
         # Filtrar el DataFrame por los números de DNI especificados
         resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
         # Selecciona solo las columnas requeridas
@@ -97,8 +93,8 @@ class ListBookWindow():
         return resultado_seleccionado
     
     
-    def seleccionar_archivo_xlsx(self,df):
-        dfDNI = df
+    def seleccionar_archivo_xlsx(self,dfarchivo):
+        dfDNI = dfarchivo
         lista_DNI = dfDNI['DNI'].tolist()
         resultado_tuplas = self.CargaMasivaDNI(lista_DNI)
         return resultado_tuplas

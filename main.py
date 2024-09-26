@@ -1,12 +1,14 @@
-from controllers.main_window import ListBookWindow
-from flask import Flask, request, jsonify,send_from_directory,render_template,redirect
+from controllers.main_window import ListBookWindow,ConsultaSpark
+from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, g
 from werkzeug.utils import secure_filename
 import pandas as pd
 
-# Crear una instancia de ListBookWindow
-list_book_window = ListBookWindow()
+
+
 
 app = Flask(__name__, template_folder='templates')
+
+list_book_window = ListBookWindow()  # Hacer accesible la instancia en g
 
 @app.route('/')
 def index():
@@ -123,7 +125,8 @@ def cargamasivaplantillaDNI():
 
     else:
         return jsonify({"error": "Formato de archivo no soportado"}), 400
-    
+
+
 
 @app.route('/Sispad.ico')
 def favicon():
