@@ -5,6 +5,7 @@ from controllers.main_window import ListBookWindow
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StringType
 import atexit
+import logging
 
 app = Flask(__name__, template_folder='templates')
 
@@ -177,17 +178,15 @@ class Api_Reniec():
 
 
 
+if __name__ == "__main__":
+    api_reniec = Api_Reniec()
 
-# Crear instancia de Api_Reniec y ejecutar
-api_reniec = Api_Reniec()
+    @atexit.register
+    def cerrar_spark():
+        api_reniec.df.unpersist()  # Liberar el caché
+        api_reniec.spark.stop()
 
-# Registrar la función para liberar recursos de Spark al finalizar
-def cerrar_spark():
-    api_reniec.df.unpersist()  # Liberar el cache del DataFrame
-    api_reniec.spark.stop()
-
-# Asignar el método cerrar_spark a ejecutarse al finalizar
-atexit.register(cerrar_spark)
-
-# Ejecutar la aplicación Flask
-api_reniec.run()
+    try:
+        api_reniec.run()
+    except Exception as e:
+        logging.error(f"Ocurrió un error: {e}")
