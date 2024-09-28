@@ -1,14 +1,113 @@
 import pandas as pd
 import os
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType
+from pyspark import StorageLevel  # Importar StorageLevel
+
+class ConsultaSpark:
+    def __init__(self):
+
+        self.spark = SparkSession.builder \
+            .appName("Lectura de archivo") \
+            .config("spark.executor.memory", "4g") \
+            .config("spark.driver.memory", "2g") \
+            .config("spark.executor.cores", "2") \
+            .config("spark.sql.shuffle.partitions", "2") \
+            .getOrCreate()
+        
+    def realizar_consulta(self):
+        
+        schema = StructType() \
+            .add("DNI", StringType(), True) \
+            .add("AP_PAT", StringType(), True) \
+            .add("AP_MAT", StringType(), True) \
+            .add("NOMBRES", StringType(), True) \
+            .add("FECHA_NAC", StringType(), True) \
+            .add("UBIGEO_NAC", StringType(), True) \
+            .add("UBIGEO_DIR", StringType(), True) \
+            .add("DIRECCION", StringType(), True) \
+            .add("SEXO", StringType(), True) \
+            .add("EST_CIVIL", StringType(), True) \
+            .add("MADRE", StringType(), True) \
+            .add("PADRE", StringType(), True)
+
+        try:
+            self.df_inicial = self.spark.read \
+                .option("delimiter", "|") \
+                .schema(schema) \
+                .csv("/data/reniec.txt") \
+                .repartition("DNI")\
+                .persist(StorageLevel.DISK_ONLY)  # Cambiado a persistir en disco
+            # Ejecutar una acción para cachear
+            self.df_inicial.count()  # Acción que activa el cacheo
+            # Retornar los datos
+            return self.df_inicial
+        except Exception as e:
+            print(f"Error al leer el archivo: {e}")
 
 
 class ListBookWindow():
-    
-    def seleccionar_archivo_Plantilla_xlsx(self,dfArchivo,dfresultado):
+    def __init__(self):
+
+        self.consultaSpark = ConsultaSpark()
+        self.df=self.consultaSpark.realizar_consulta() 
+
+    def ConsultaxDNINombresApellidos(self, typeconsulta, dni, Nom, Ap_pat, Ap_mat):
         
-        dfDNI = dfArchivo
-        lista_DNI=dfDNI['DNI'].tolist()
-        DataFrameSpark = dfresultado
+        if typeconsulta=='0':
+            resultado = self.df.filter(self.df["DNI"] == dni)
+        elif typeconsulta=='1':
+            if Nom != "" and Ap_pat != "" and Ap_mat != "":
+                resultado = self.df.filter((self.df["NOMBRES"] == Nom) & (self.df["AP_PAT"] == Ap_pat) & (self.df["AP_MAT"] == Ap_mat))
+                
+            elif Nom == "" and Ap_pat != "" and Ap_mat != "":
+                resultado = self.df.filter((self.df["AP_PAT"] == Ap_pat) & (self.df["AP_MAT"] == Ap_mat))
+            
+        # Selecciona solo las columnas requeridas
+        resultado_seleccionado = resultado.select("DNI", "NOMBRES", "AP_PAT", "AP_MAT", "FECHA_NAC", "DIRECCION", "EST_CIVIL", "MADRE", "PADRE","SEXO")
+        
+        # Convierte el DataFrame a una lista de tuplas
+        resultado_tuplas = [tuple(row) for row in resultado_seleccionado.collect()]
+
+        return resultado_tuplas
+    
+    #Funcion carga masiva dde DNI
+    
+    def CargaMasivaDNI(self,lista_dni):
+        
+        # Filtrar el DataFrame por los números de DNI especificados
+        resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
+        # Selecciona solo las columnas requeridas
+        resultado_seleccionado = resultado.select("DNI", "NOMBRES", "AP_PAT", "AP_MAT", "FECHA_NAC", "DIRECCION", "EST_CIVIL", "MADRE", "PADRE","SEXO")
+        # Convierte el DataFrame a una lista de tuplas
+        resultado_tuplas = [tuple(row) for row in resultado_seleccionado.collect()]
+        
+        return resultado_tuplas
+    
+
+    def CargaMasivaPlantillaDNI(self,lista_dni):
+        
+        # Filtrar el DataFrame por los números de DNI especificados
+        resultado = self.df.filter(self.df['DNI'].isin(lista_dni))
+        # Selecciona solo las columnas requeridas
+        resultado_seleccionado = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
+        
+        return resultado_seleccionado
+    
+    
+    def seleccionar_archivo_xlsx(self,dfarchivo):
+        dfDNI = dfarchivo
+        lista_DNI = dfDNI['DNI'].tolist()
+        resultado_tuplas = self.CargaMasivaDNI(lista_DNI)
+        return resultado_tuplas
+        
+        
+    def seleccionar_archivo_Plantilla_xlsx(self,dfPlantilla):
+        
+        dfDNI = dfPlantilla
+        lista_DNI = dfDNI['DNI'].tolist()
+        
+        DataFrameSpark = self.CargaMasivaPlantillaDNI(lista_DNI)
         Pandas_DataFrameSpark = DataFrameSpark.toPandas()
         
         lista_DNI_Spark = Pandas_DataFrameSpark["DNI"].tolist()
