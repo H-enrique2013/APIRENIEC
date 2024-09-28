@@ -35,15 +35,6 @@ RUN curl -fSL https://downloads.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/
 
 RUN chmod +x $SPARK_HOME/bin/* && chmod +x $HADOOP_HOME/bin/*
 
-# Compilar e instalar las bibliotecas nativas de Hadoop
-RUN mkdir -p /opt/hadoop-native \
-    && cd /opt/hadoop-native \
-    && wget https://downloads.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION-src.tar.gz \
-    && tar -xvzf hadoop-$HADOOP_VERSION-src.tar.gz \
-    && cd hadoop-$HADOOP_VERSION-src/hadoop-common-project/hadoop-common \
-    && mvn clean install -Pdist,native -DskipTests -Dtar -Dmaven.javadoc.skip=true -e \
-    && cp -r target/native/* $HADOOP_HOME/lib/native/
-
 # Instalar dependencias de Python
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir gunicorn

@@ -152,3 +152,6 @@ if __name__ == "__main__":
         api_reniec.run()
     except Exception as e:
         logging.error(f"Ocurrió un error al ejecutar la aplicación: {e}")
+
+
+
