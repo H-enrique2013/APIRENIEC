@@ -174,7 +174,7 @@ class Api_Reniec():
         
         if __name__ == "__main__":
             # Obtener el puerto del entorno, si está disponible
-            port = int(os.environ.get('PORT', 8000))
+            port = int(os.environ.get('PORT', 8080))
             logging.info(f"Iniciando servidor en el puerto {port}")
             app.run(host='0.0.0.0', port=port)
 
