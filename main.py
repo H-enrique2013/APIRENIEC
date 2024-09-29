@@ -171,20 +171,21 @@ class Api_Reniec():
                     return jsonify({"error": "No se encontró información para los datos proporcionados"}), 404
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
+            
+
+        return app
         
-        if __name__ == "__main__":
-            # Obtener el puerto del entorno, si está disponible
-            port = int(os.environ.get('PORT', 8080))
-            logging.info(f"Iniciando servidor en el puerto {port}")
-            app.run(host='0.0.0.0', port=port)
 
 
+# Instanciar Api_Reniec fuera del bloque principal
+api_reniec = Api_Reniec()
+
+# Exponer el objeto Flask para Gunicorn
+app = api_reniec.run()
 
 if __name__ == "__main__":
-    api_reniec = Api_Reniec()
-
-    try:
-        api_reniec.run()  # Iniciar la aplicación Flask sin el argumento debug
-    except Exception as e:
-        logging.error(f"Ocurrió un error al ejecutar la aplicación: {e}")
+    # Obtener el puerto del entorno, si está disponible
+    port = int(os.environ.get('PORT', 8000))
+    logging.info(f"Iniciando servidor en el puerto {port}")
+    app.run(host='0.0.0.0', port=port)
 
