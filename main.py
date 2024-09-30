@@ -8,6 +8,7 @@ import logging
 import os
 from pyspark import StorageLevel  # Importar StorageLevel
 from controllers.main_window import ListBookWindow
+from pyspark.sql import functions as F
 
 
 # Configurar logging
@@ -136,8 +137,8 @@ class Api_Reniec():
             
             try:
                 df_archivo = pd.read_excel(archivo, dtype={'DNI': str})
-                lista_dni = df_archivo['DNI'].tolist()
-                filtro = f"DNI IN ({', '.join([f'{dni}' for dni in lista_dni])})"
+                lista_DNI = df_archivo['DNI'].tolist()
+                filtro = F.col("DNI").isin(lista_DNI)
                 resultado = self.cargar_parte_relevante(filtro)
                 resultado_seleccionado = resultado.select("DNI", "NOMBRES", "AP_PAT", "AP_MAT", "FECHA_NAC", "DIRECCION", "EST_CIVIL", "MADRE", "PADRE", "SEXO")
                 ResultadoConsulta = [tuple(row) for row in resultado_seleccionado.collect()]
@@ -158,15 +159,13 @@ class Api_Reniec():
             try:
                 # Leer el archivo Excel directamente en un DataFrame
                 df_archivo = pd.read_excel(archivo,dtype={'DNI': str})
-                
-                lista_dni=df_archivo['DNI'].tolist()
-                filtro = f"DNI IN ({', '.join([f'{dni}' for dni in lista_dni])})"
+                lista_DNI=df_archivo['DNI'].tolist()
+                filtro = F.col("DNI").isin(lista_DNI)
                 resultado = self.cargar_parte_relevante(filtro)
                 # Selecciona solo las columnas requeridas
-                resultado_selec = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
+                #resultado_selec = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
                 # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
-                plantilla= self.list_book_window.seleccionar_archivo_Plantilla_xlsx(df_archivo,resultado_selec)
-                 
+                plantilla= self.list_book_window.seleccionar_archivo_Plantilla_xlsx(df_archivo,resultado)
                 # Verificar si el resultado es válido
                 if plantilla:
                     return jsonify(plantilla), 200
@@ -175,7 +174,6 @@ class Api_Reniec():
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
             
-
         return app
         
 # Instanciar Api_Reniec fuera del bloque principal
