@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
 from werkzeug.utils import secure_filename
 import pandas as pd
-from controllers.main_window import ListBookWindow
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StringType
 import atexit
 import logging
 import os
 from pyspark import StorageLevel  # Importar StorageLevel
+from pyspark.sql import functions as F
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -40,10 +40,8 @@ class Api_Reniec():
             .add("SEXO", StringType(), True) \
             .add("EST_CIVIL", StringType(), True) \
             .add("MADRE", StringType(), True) \
-            .add("PADRE", StringType(), True)
-
-        self.list_book_window = ListBookWindow()
-
+            .add("PADRE", StringType(), True) 
+    
     def cerrar_spark(self):
         if self.spark is not None:
             try:
@@ -54,7 +52,7 @@ class Api_Reniec():
         else:
             logging.warning("No hay una sesión de Spark activa para cerrar.")
 
-
+    
     def cargar_parte_relevante(self, filtro):
         """Carga solo la parte relevante del archivo según el filtro"""
         df = self.spark.read \
@@ -135,8 +133,8 @@ class Api_Reniec():
             
             try:
                 df_archivo = pd.read_excel(archivo, dtype={'DNI': str})
-                lista_dni = df_archivo['DNI'].tolist()
-                filtro = f"DNI IN ({', '.join([f'{dni}' for dni in lista_dni])})"
+                lista_DNI = df_archivo['DNI'].tolist()
+                filtro = F.col("DNI").isin(lista_DNI)
                 resultado = self.cargar_parte_relevante(filtro)
                 resultado_seleccionado = resultado.select("DNI", "NOMBRES", "AP_PAT", "AP_MAT", "FECHA_NAC", "DIRECCION", "EST_CIVIL", "MADRE", "PADRE", "SEXO")
                 ResultadoConsulta = [tuple(row) for row in resultado_seleccionado.collect()]
@@ -156,26 +154,100 @@ class Api_Reniec():
                 return error
             try:
                 # Leer el archivo Excel directamente en un DataFrame
-                df_archivo = pd.read_excel(archivo,dtype={'DNI': str})
-                lista_dni=df_archivo['DNI'].tolist()
-                filtro = f"DNI IN ({', '.join([f'{dni}' for dni in lista_dni])})"
+                dfDNI = pd.read_excel(archivo,dtype={'DNI': str})
+                dfUbigeos=pd.read_excel("geodir-ubigeo-reniec.xlsx",dtype={"Ubigeo":str})
+                lista_DNI=dfDNI['DNI'].tolist()
+                # Crea un filtro utilizando la función 'isin' de PySpark
+                filtro = F.col("DNI").isin(lista_DNI)
+                # Aplica el filtro directamente al DataFrame Spark
                 resultado = self.cargar_parte_relevante(filtro)
                 # Selecciona solo las columnas requeridas
-                resultado_selec = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
+                DataFrameSpark = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
                 # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
-                plantilla= self.list_book_window.seleccionar_archivo_Plantilla_xlsx(df_archivo,resultado_selec)     
+                #plantilla= self.list_book_window.seleccionar_archivo_Plantilla_xlsx(df_archivo,resultado_selec)
+                Pandas_DataFrameSpark = DataFrameSpark.toPandas()
+                
+                lista_DNI_Spark = Pandas_DataFrameSpark["DNI"].tolist()
+                #Crear el Dataframe completo a la lista de DNI's  encontrados
+                Nuevo_dfDNI = dfDNI[dfDNI["DNI"].isin(lista_DNI_Spark)].copy()  # Asegurarse de crear una copia
+
+                # Evitar SettingWithCopyWarning usando .loc
+                Nuevo_dfDNI.loc[:, 'DNI'] = Nuevo_dfDNI['DNI'].astype(str)
+                Pandas_DataFrameSpark.loc[:, 'DNI'] = Pandas_DataFrameSpark['DNI'].astype(str)
+
+                # Unir los DataFrames por la columna 'DNI', manteniendo el orden de Nuevo_dfDNI
+                merged_df = pd.merge(Nuevo_dfDNI, Pandas_DataFrameSpark, on='DNI', how='left')
+                
+                # Seleccionar todas las columnas del segundo DataFrame excepto 'DNI' después de la fusión si es necesario
+                merged_df = merged_df.drop(columns=['DNI_y']) if 'DNI_y' in merged_df.columns else merged_df
+                
+                # Separar los valores de la columna "UBIGEO_DIR" en nuevas columnas
+                merged_df[['DEPARTAMENTO_D', 'PROVINCIA_D', 'DISTRITO_D']] = merged_df['UBIGEO_DIR'].str.split('-', expand=True)
+                merged_df["UBIGEO_DIR"]=" "
+                #Cargar Ubigeos
+                dfUbigeos=dfUbigeos.drop(["Poblacion","Superficie","Y","X"],axis=1)
+                dfUbigeos_nac = dfUbigeos.rename(columns={
+                    "Ubigeo": "UBIGEO_NAC",
+                    "Distrito": "DISTRITO_N",
+                    "Provincia": "PROVINCIA_N",
+                    "Departamento": "DEPARTAMENTO_N"
+                })
+                
+                merged_df1 = pd.merge(merged_df,dfUbigeos_nac, on='UBIGEO_NAC', how='left')
+                merged_df2 = merged_df1[["DNI","Superficie","Monto_Indemnizable","AP_PAT_ENTRADA","AP_MAT_ENTRADA","NOMBRES_ENTRADA","FECHA_NAC_ENTRADA",
+                                        "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC","EST_CIVIL","DIRECCION","UBIGEO_DIR","DEPARTAMENTO_D","PROVINCIA_D","DISTRITO_D",
+                                        "PADRE","MADRE","UBIGEO_NAC","DEPARTAMENTO_N","PROVINCIA_N","DISTRITO_N"]]
+                
+                #Realizar el codigo para completar la columna "UBIGEO_DIR" que está vacia
+                #Renombrar las columnas de dfUbigeos_nac
+                dfUbigeos_nac_renamed = dfUbigeos_nac.rename(columns={
+                        "DEPARTAMENTO_N": "DEPARTAMENTO_DIR",
+                        "PROVINCIA_N": "PROVINCIA_DIR",
+                        "DISTRITO_N": "DISTRITO_DIR",
+                        "UBIGEO_NAC": "UBIGEO_DIR_TEMP"
+                    })
+                
+                #Realizar el merge condicional
+                merged_df2 = merged_df2.merge(dfUbigeos_nac_renamed[['DEPARTAMENTO_DIR', 'PROVINCIA_DIR', 'DISTRITO_DIR', 'UBIGEO_DIR_TEMP']],
+                                    left_on=['DEPARTAMENTO_D', 'PROVINCIA_D', 'DISTRITO_D'],
+                                    right_on=['DEPARTAMENTO_DIR', 'PROVINCIA_DIR', 'DISTRITO_DIR'],
+                                    how='left')
+                
+                #Completar la columna UBIGEO_DIR
+                merged_df2['UBIGEO_DIR'] = merged_df2['UBIGEO_DIR_TEMP']
+                #Limpiar el DataFrame
+                merged_df2.drop(columns=['DEPARTAMENTO_DIR', 'PROVINCIA_DIR', 'DISTRITO_DIR', 'UBIGEO_DIR_TEMP'], inplace=True)
+
+                #########################################################################################
+                lista_DNI_NoEncontrados=[]
+                #Crear el Dataframe completo a la lista de DNI's no encontrados
+                for i in lista_DNI:
+                    if not i in lista_DNI_Spark:
+                        lista_DNI_NoEncontrados.append(i)
+                
+                if len(lista_DNI_NoEncontrados)!=0:
+                    Nuevo_dfDNI_NoEncontrados=dfDNI[dfDNI["DNI"].isin(lista_DNI_NoEncontrados)].copy()
+                    # Lista de nombres de las nuevas columnas
+                    columnas_nuevas = ['AP_PAT', 'AP_MAT', 'NOMBRES', 'SEXO', 'FECHA_NAC', 'DIRECCION','UBIGEO_DIR',
+                                    'DEPARTAMENTO_D', 'PROVINCIA_D', 'DISTRITO_D', 'PADRE','MADRE', 'UBIGEO_NAC',
+                                    'DEPARTAMENTO_N', 'PROVINCIA_N', 'DISTRITO_N']
+
+                    # Añadir las columnas nuevas con campos vacios " "
+                    for columna in columnas_nuevas:
+                        Nuevo_dfDNI_NoEncontrados[columna] =' '
+                    
+                    merged_df2=pd.concat([merged_df2, Nuevo_dfDNI_NoEncontrados], ignore_index=True)
+
+                DtaTuplas_Plantilla = merged_df2.values.tolist()
+                
                 # Verificar si el resultado es válido
-                if plantilla:
-                    return jsonify(plantilla), 200
+                if DtaTuplas_Plantilla:
+                    return jsonify(DtaTuplas_Plantilla), 200
                 else:
                     return jsonify({"error": "No se encontró información para los datos proporcionados"}), 404
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
-            
-
         return app
-        
-
 
 # Instanciar Api_Reniec fuera del bloque principal
 api_reniec = Api_Reniec()
