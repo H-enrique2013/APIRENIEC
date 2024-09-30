@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, template_folder='templates')
 
-
 class Api_Reniec():
     
     def __init__(self):
@@ -162,10 +161,10 @@ class Api_Reniec():
                 # Aplica el filtro directamente al DataFrame Spark
                 resultado = self.cargar_parte_relevante(filtro)
                 # Selecciona solo las columnas requeridas
-                DataFrameSpark = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
+                #DataFrameSpark = resultado.select("DNI", "AP_PAT", "AP_MAT","NOMBRES","SEXO","FECHA_NAC", "DIRECCION","UBIGEO_DIR","UBIGEO_NAC","EST_CIVIL","PADRE", "MADRE")
                 # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
                 #plantilla= self.list_book_window.seleccionar_archivo_Plantilla_xlsx(df_archivo,resultado_selec)
-                Pandas_DataFrameSpark = DataFrameSpark.toPandas()
+                Pandas_DataFrameSpark = resultado.toPandas()
                 
                 lista_DNI_Spark = Pandas_DataFrameSpark["DNI"].tolist()
                 #Crear el Dataframe completo a la lista de DNI's  encontrados
