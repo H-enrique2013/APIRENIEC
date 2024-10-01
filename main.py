@@ -32,14 +32,14 @@ class Api_Reniec():
             .add("AP_PAT", StringType(), True) \
             .add("AP_MAT", StringType(), True) \
             .add("NOMBRES", StringType(), True) \
-            .add("FECHA_NAC", StringType(), True) \
-            .add("UBIGEO_NAC", StringType(), True) \
-            .add("UBIGEO_DIR", StringType(), True) \
-            .add("DIRECCION", StringType(), True) \
             .add("SEXO", StringType(), True) \
+            .add("FECHA_NAC", StringType(), True) \
+            .add("DIRECCION", StringType(), True) \
+            .add("UBIGEO_DIR", StringType(), True) \
+            .add("UBIGEO_NAC", StringType(), True) \
             .add("EST_CIVIL", StringType(), True) \
-            .add("MADRE", StringType(), True) \
-            .add("PADRE", StringType(), True) 
+            .add("PADRE", StringType(), True) \
+            .add("MADRE", StringType(), True)
     
     def cerrar_spark(self):
         if self.spark is not None:
@@ -57,7 +57,7 @@ class Api_Reniec():
         df = self.spark.read \
             .option("delimiter", "|") \
             .schema(self.schema) \
-            .csv("/data/reniec.txt") \
+            .csv("bdreniecreducida30_09_24.txt") \
             .repartition(5) \
             .filter(filtro)
         return df
@@ -165,7 +165,6 @@ class Api_Reniec():
                 # Supongamos que la función `seleccionar_archivo_xlsx` hace algún tipo de procesamiento
                 #plantilla= self.list_book_window.seleccionar_archivo_Plantilla_xlsx(df_archivo,resultado_selec)
                 Pandas_DataFrameSpark = resultado.toPandas()
-                
                 lista_DNI_Spark = Pandas_DataFrameSpark["DNI"].tolist()
                 #Crear el Dataframe completo a la lista de DNI's  encontrados
                 Nuevo_dfDNI = dfDNI[dfDNI["DNI"].isin(lista_DNI_Spark)].copy()  # Asegurarse de crear una copia
