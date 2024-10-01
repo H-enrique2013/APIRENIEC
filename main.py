@@ -35,14 +35,14 @@ class Api_Reniec():
             .add("AP_PAT", StringType(), True) \
             .add("AP_MAT", StringType(), True) \
             .add("NOMBRES", StringType(), True) \
-            .add("FECHA_NAC", StringType(), True) \
-            .add("UBIGEO_NAC", StringType(), True) \
-            .add("UBIGEO_DIR", StringType(), True) \
-            .add("DIRECCION", StringType(), True) \
             .add("SEXO", StringType(), True) \
+            .add("FECHA_NAC", StringType(), True) \
+            .add("DIRECCION", StringType(), True) \
+            .add("UBIGEO_DIR", StringType(), True) \
+            .add("UBIGEO_NAC", StringType(), True) \
             .add("EST_CIVIL", StringType(), True) \
-            .add("MADRE", StringType(), True) \
-            .add("PADRE", StringType(), True)
+            .add("PADRE", StringType(), True) \
+            .add("MADRE", StringType(), True)
 
         self.list_book_window = ListBookWindow()
     
@@ -62,7 +62,7 @@ class Api_Reniec():
         df = self.spark.read \
             .option("delimiter", "|") \
             .schema(self.schema) \
-            .csv("reniec.txt") \
+            .csv("/data/bdreniecreducida30_09_24.txt") \
             .repartition(5) \
             .filter(filtro)
         return df
