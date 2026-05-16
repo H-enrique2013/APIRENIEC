@@ -62,7 +62,7 @@ class Api_Reniec():
         df = self.spark.read \
             .option("delimiter", "|") \
             .schema(self.schema) \
-            .csv("/data/bdreniecreducida30_09_24.txt") \
+            .csv("bdreniecreducida30_09_24.txt") \
             .repartition(5) \
             .filter(filtro)
         return df
