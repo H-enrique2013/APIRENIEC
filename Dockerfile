@@ -43,14 +43,16 @@ RUN useradd -ms /bin/sh appuser
 
 WORKDIR /app
 
-COPY . .
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --timeout=120 -r requirements.txt
-
+COPY . .
+RUN sed -i 's/\r$//' /app/start.sh && chmod +x /app/start.sh
 RUN chown -R appuser:appuser /app
+RUN chmod +x /app/start.sh
 USER appuser
 
 EXPOSE 8000
-
-CMD ["bash", "/app/start.sh"]
+CMD ["/app/start.sh"]
+#CMD ["python", "main.py"]
+#CMD ["bash", "/app/start.sh"]

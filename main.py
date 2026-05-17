@@ -10,6 +10,18 @@ from pyspark import StorageLevel  # Importar StorageLevel
 from controllers.main_window import ListBookWindow
 from pyspark.sql import functions as F
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from azure.storage.blob import BlobClient
+import os
+
+connection_string = os.environ["AZURE_STORAGE_CONNECTION_STRING"]
+container = os.environ.get("RENIEC_CONTAINER", "reniec-data")
+blob_name = os.environ.get("RENIEC_BLOB_NAME", "bdreniecreducida30_09_24.txt")
+local_path = os.environ.get("LOCAL_RENIEC_PATH", "/tmp/bdreniecreducida30_09_24.txt")
+
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +32,7 @@ app = Flask(__name__, template_folder='templates')
 class Api_Reniec():
     
     def __init__(self):
+        
         self.spark = SparkSession.builder \
             .appName("Lectura de archivo") \
             .config("spark.executor.memory", "8g") \
@@ -58,15 +71,16 @@ class Api_Reniec():
 
     
     def cargar_parte_relevante(self, filtro):
+        ruta_txt = descargar_reniec_si_no_existe()
         """Carga solo la parte relevante del archivo según el filtro"""
         df = self.spark.read \
             .option("delimiter", "|") \
             .schema(self.schema) \
-            .csv("/data/bdreniecreducida30_09_24.txt") \
+            .csv(ruta_txt) \
             .repartition(5) \
             .filter(filtro)
         return df
-
+    
     def validar_archivo_excel(self, archivo_nombre):
         """Valida que el archivo subido sea un archivo de Excel válido"""
         archivo = request.files.get(archivo_nombre)
@@ -176,6 +190,25 @@ class Api_Reniec():
             
         return app
         
+
+def descargar_reniec_si_no_existe():
+    if not os.path.exists(local_path):
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+
+        blob = BlobClient.from_connection_string(
+            conn_str=connection_string,
+            container_name=container,
+            blob_name=blob_name
+        )
+
+        with open(local_path, "wb") as file:
+            stream = blob.download_blob()
+            stream.readinto(file)
+
+        print(f"Archivo descargado en: {local_path}")
+        print(f"Tamaño: {os.path.getsize(local_path)} bytes")
+
+    return local_path
 # Instanciar Api_Reniec fuera del bloque principal
 api_reniec = Api_Reniec()
 
